@@ -1,0 +1,1418 @@
+openapi: 3.0.3
+info:
+  title: Driving School Management API
+  version: 1.0.0
+  description: The Driving School Management API
+
+servers:
+  - url: http://localhost:8080
+
+tags:
+  - name: Persons
+  - name: Students
+  - name: Instructors
+  - name: Vehicles
+  - name: Enrollments
+  - name: Lessons
+  - name: Exams
+
+paths:
+  /persons:
+    get:
+      tags:
+        - Persons
+      summary: List persons
+      operationId: listPersons
+      responses:
+        '200':
+          description: List of persons
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Person'
+    post:
+      tags:
+        - Persons
+      summary: Create a new person
+      operationId: createPerson
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PersonCreate'
+      responses:
+        '201':
+          description: Person created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Person'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /persons/{id}:
+    get:
+      tags:
+        - Persons
+      summary: Get person by id
+      operationId: getPersonById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Person found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Person'
+        '404':
+          description: Person not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    patch:
+      tags:
+        - Persons
+      summary: Update an existing person
+      operationId: updatePerson
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PersonUpdate'
+      responses:
+        '200':
+          description: Person updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Person'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Person not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /students:
+    get:
+      tags:
+        - Students
+      summary: List students
+      operationId: listStudents
+      responses:
+        '200':
+          description: List of students
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Student'
+    post:
+      tags:
+        - Students
+      summary: Promote person to student
+      operationId: createStudent
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StudentCreate'
+      responses:
+        '201':
+          description: Student created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Student'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /students/{id}:
+    get:
+      tags:
+        - Students
+      summary: Get student by id
+      operationId: getStudentById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Student found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Student'
+        '404':
+          description: Student not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    patch:
+      tags:
+        - Students
+      summary: Update student attributes
+      operationId: updateStudent
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StudentUpdate'
+      responses:
+        '200':
+          description: Student updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Student'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Student not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /students/{id}/lessons:
+    get:
+      tags:
+        - Lessons
+      summary: List lessons for a student
+      operationId: listStudentLessons
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: completed
+          in: query
+          required: false
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: List of lessons
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Lesson'
+        '404':
+          description: Student not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /students/{id}/exams:
+    get:
+      tags:
+        - Exams
+      summary: List exams for a student
+      operationId: listStudentExams
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: from
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+        - name: to
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: List of exams
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Exam'
+        '404':
+          description: Student not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /students/{id}/enrollments:
+    get:
+      tags:
+        - Enrollments
+      summary: List enrollments for a student
+      operationId: listStudentEnrollments
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: List of enrollments
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Enrollment'
+        '404':
+          description: Student not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /instructors:
+    get:
+      tags:
+        - Instructors
+      summary: List instructors
+      operationId: listInstructors
+      responses:
+        '200':
+          description: List of instructors
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Instructor'
+    post:
+      tags:
+        - Instructors
+      summary: Promote person to instructor
+      operationId: createInstructor
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InstructorCreate'
+      responses:
+        '201':
+          description: Instructor created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Instructor'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /instructors/{id}:
+    get:
+      tags:
+        - Instructors
+      summary: Get instructor by id
+      operationId: getInstructorById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Instructor found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Instructor'
+        '404':
+          description: Instructor not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    patch:
+      tags:
+        - Instructors
+      summary: Update instructor attributes
+      operationId: updateInstructor
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InstructorUpdate'
+      responses:
+        '200':
+          description: Instructor updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Instructor'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Instructor not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /instructors/{id}/lessons:
+    get:
+      tags:
+        - Lessons
+      summary: List lessons for an instructor on a date
+      operationId: listInstructorLessons
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: date
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: List of lessons
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Lesson'
+        '404':
+          description: Instructor not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /instructors/{id}/exams:
+    get:
+      tags:
+        - Exams
+      summary: List exams for an instructor
+      operationId: listInstructorExams
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: from
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+        - name: to
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: List of exams
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Exam'
+        '404':
+          description: Instructor not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /instructors/{id}/enrollments:
+    get:
+      tags:
+        - Enrollments
+      summary: List enrollments for an instructor
+      operationId: listInstructorEnrollments
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: List of enrollments
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Enrollment'
+        '404':
+          description: Instructor not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /vehicles:
+    get:
+      tags:
+        - Vehicles
+      summary: List vehicles
+      operationId: listVehicles
+      responses:
+        '200':
+          description: List of vehicles
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Vehicle'
+    post:
+      tags:
+        - Vehicles
+      summary: Create a new vehicle
+      operationId: createVehicle
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VehicleCreate'
+      responses:
+        '201':
+          description: Vehicle created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Vehicle'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /vehicles/{id}:
+    get:
+      tags:
+        - Vehicles
+      summary: Get vehicle by id
+      operationId: getVehicleById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Vehicle found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Vehicle'
+        '404':
+          description: Vehicle not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    patch:
+      tags:
+        - Vehicles
+      summary: Update a vehicle
+      operationId: updateVehicle
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VehicleUpdate'
+      responses:
+        '200':
+          description: Vehicle updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Vehicle'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Vehicle not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /enrollments:
+    get:
+      tags:
+        - Enrollments
+      summary: List enrollments
+      operationId: listEnrollments
+      responses:
+        '200':
+          description: List of enrollments
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Enrollment'
+    post:
+      tags:
+        - Enrollments
+      summary: Create a new enrollment
+      operationId: createEnrollment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EnrollmentCreate'
+      responses:
+        '201':
+          description: Enrollment created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Enrollment'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /enrollments/{id}:
+    get:
+      tags:
+        - Enrollments
+      summary: Get enrollment by id
+      operationId: getEnrollmentById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Enrollment found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Enrollment'
+        '404':
+          description: Enrollment not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    patch:
+      tags:
+        - Enrollments
+      summary: Update an enrollment
+      operationId: updateEnrollment
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EnrollmentUpdate'
+      responses:
+        '200':
+          description: Enrollment updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Enrollment'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Enrollment not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /enrollments/{id}/lessons:
+    post:
+      tags:
+        - Lessons
+      summary: Schedule a lesson for an enrollment
+      operationId: createLessonForEnrollment
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LessonCreate'
+      responses:
+        '201':
+          description: Lesson created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Lesson'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Enrollment not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /lessons:
+    get:
+      tags:
+        - Lessons
+      summary: List lessons for a given date
+      operationId: listLessonsByDate
+      parameters:
+        - name: date
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: List of lessons
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Lesson'
+
+  /lessons/{id}:
+    get:
+      tags:
+        - Lessons
+      summary: Get lesson by id
+      operationId: getLessonById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Lesson found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Lesson'
+        '404':
+          description: Lesson not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    patch:
+      tags:
+        - Lessons
+      summary: Update a lesson
+      operationId: updateLesson
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LessonUpdate'
+      responses:
+        '200':
+          description: Lesson updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Lesson'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Lesson not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /enrollments/{id}/exams:
+    post:
+      tags:
+        - Exams
+      summary: Schedule an exam for an enrollment
+      operationId: createExamForEnrollment
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExamCreate'
+      responses:
+        '201':
+          description: Exam created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Exam'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Enrollment not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /exams:
+    get:
+      tags:
+        - Exams
+      summary: List exams for a given date
+      operationId: listExamsByDate
+      parameters:
+        - name: date
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: List of exams
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Exam'
+
+  /exams/{id}:
+    get:
+      tags:
+        - Exams
+      summary: Get exam by id
+      operationId: getExamById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Exam found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Exam'
+        '404':
+          description: Exam not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    patch:
+      tags:
+        - Exams
+      summary: Update an exam
+      operationId: updateExam
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExamUpdate'
+      responses:
+        '200':
+          description: Exam updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Exam'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Exam not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  schemas:
+    LicenseCategory:
+      type: string
+      enum: [A, A1, A2, B, BE, C, D]
+
+    LessonType:
+      type: string
+      enum: [practical, theoretical]
+
+    Person:
+      type: object
+      properties:
+        id:
+          type: integer
+        pnc:
+          type: string
+        dob:
+          type: string
+          format: date
+        first_name:
+          type: string
+        last_name:
+          type: string
+        email_address:
+          type: string
+          format: email
+        phone_number:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+      required:
+        - id
+        - pnc
+        - dob
+        - first_name
+        - last_name
+        - email_address
+        - phone_number
+        - created_at
+
+    PersonCreate:
+      type: object
+      properties:
+        pnc:
+          type: string
+        dob:
+          type: string
+          format: date
+        first_name:
+          type: string
+        last_name:
+          type: string
+        email_address:
+          type: string
+          format: email
+        phone_number:
+          type: string
+      required:
+        - pnc
+        - dob
+        - first_name
+        - last_name
+        - email_address
+        - phone_number
+
+    PersonUpdate:
+      type: object
+      properties:
+        dob:
+          type: string
+          format: date
+        first_name:
+          type: string
+        last_name:
+          type: string
+        email_address:
+          type: string
+          format: email
+        phone_number:
+          type: string
+
+    Student:
+      type: object
+      properties:
+        id:
+          type: integer
+        person_id:
+          type: integer
+        is_compliant:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+      required:
+        - id
+        - person_id
+        - is_compliant
+        - created_at
+
+    StudentCreate:
+      type: object
+      properties:
+        person_id:
+          type: integer
+      required:
+        - person_id
+
+    StudentUpdate:
+      type: object
+      properties:
+        is_compliant:
+          type: boolean
+
+    Instructor:
+      type: object
+      properties:
+        id:
+          type: integer
+        person_id:
+          type: integer
+        license_category:
+          $ref: '#/components/schemas/LicenseCategory'
+        is_compliant:
+          type: boolean
+        is_active:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+      required:
+        - id
+        - person_id
+        - license_category
+        - is_compliant
+        - is_active
+        - created_at
+
+    InstructorCreate:
+      type: object
+      properties:
+        person_id:
+          type: integer
+        license_category:
+          $ref: '#/components/schemas/LicenseCategory'
+      required:
+        - person_id
+        - license_category
+
+    InstructorUpdate:
+      type: object
+      properties:
+        license_category:
+          $ref: '#/components/schemas/LicenseCategory'
+        is_compliant:
+          type: boolean
+        is_active:
+          type: boolean
+
+    Vehicle:
+      type: object
+      properties:
+        id:
+          type: integer
+        registration_number:
+          type: string
+        license_category:
+          $ref: '#/components/schemas/LicenseCategory'
+        min_age:
+          type: integer
+        make:
+          type: string
+        model:
+          type: string
+        year:
+          type: integer
+        transmission:
+          type: string
+        fuel_type:
+          type: string
+        is_active:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+      required:
+        - id
+        - registration_number
+        - license_category
+        - min_age
+        - make
+        - model
+        - year
+        - transmission
+        - fuel_type
+        - is_active
+        - created_at
+
+    VehicleCreate:
+      type: object
+      properties:
+        registration_number:
+          type: string
+        license_category:
+          $ref: '#/components/schemas/LicenseCategory'
+        min_age:
+          type: integer
+        make:
+          type: string
+        model:
+          type: string
+        year:
+          type: integer
+        transmission:
+          type: string
+        fuel_type:
+          type: string
+      required:
+        - registration_number
+        - license_category
+        - min_age
+        - make
+        - model
+        - year
+        - transmission
+        - fuel_type
+
+    VehicleUpdate:
+      type: object
+      properties:
+        license_category:
+          $ref: '#/components/schemas/LicenseCategory'
+        min_age:
+          type: integer
+        make:
+          type: string
+        model:
+          type: string
+        year:
+          type: integer
+        transmission:
+          type: string
+        fuel_type:
+          type: string
+        is_active:
+          type: boolean
+
+    Enrollment:
+      type: object
+      properties:
+        id:
+          type: integer
+        student_id:
+          type: integer
+        instructor_id:
+          type: integer
+        vehicle_id:
+          type: integer
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+      required:
+        - id
+        - student_id
+        - instructor_id
+        - vehicle_id
+        - created_at
+
+    EnrollmentCreate:
+      type: object
+      properties:
+        student_id:
+          type: integer
+        instructor_id:
+          type: integer
+        vehicle_id:
+          type: integer
+      required:
+        - student_id
+        - instructor_id
+        - vehicle_id
+
+    EnrollmentUpdate:
+      type: object
+      properties:
+        instructor_id:
+          type: integer
+        vehicle_id:
+          type: integer
+
+    Lesson:
+      type: object
+      properties:
+        id:
+          type: integer
+        enrollment_id:
+          type: integer
+        count:
+          type: integer
+        type:
+          $ref: '#/components/schemas/LessonType'
+        date:
+          type: string
+          format: date
+        location:
+          type: string
+        completed:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+      required:
+        - id
+        - enrollment_id
+        - count
+        - type
+        - date
+        - location
+        - completed
+        - created_at
+
+    LessonCreate:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/LessonType'
+        date:
+          type: string
+          format: date
+        location:
+          type: string
+      required:
+        - type
+        - date
+        - location
+
+    LessonUpdate:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/LessonType'
+        date:
+          type: string
+          format: date
+        location:
+          type: string
+        completed:
+          type: boolean
+
+    Exam:
+      type: object
+      properties:
+        id:
+          type: integer
+        enrollment_id:
+          type: integer
+        date:
+          type: string
+          format: date
+        hour:
+          type: string
+          format: time
+        location:
+          type: string
+        completed:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+      required:
+        - id
+        - enrollment_id
+        - date
+        - hour
+        - location
+        - completed
+        - created_at
+
+    ExamCreate:
+      type: object
+      properties:
+        date:
+          type: string
+          format: date
+        hour:
+          type: string
+          format: time
+        location:
+          type: string
+      required:
+        - date
+        - hour
+        - location
+
+    ExamUpdate:
+      type: object
+      properties:
+        date:
+          type: string
+          format: date
+        hour:
+          type: string
+          format: time
+        location:
+          type: string
+        completed:
+          type: boolean
+
+    Error:
+      type: object
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+      required:
+        - code
+        - message
