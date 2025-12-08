@@ -39,10 +39,8 @@ public class Instructor {
     @Column(name = "updated_at")
     private Instant updatedAt;
 
-/*
- TODO [Reverse Engineering] create field to map the 'license_category' column
- Available actions: Define target Java type | Uncomment as is | Remove column mapping
-    @Column(name = "license_category", columnDefinition = "license_category not null")
-    private Object licenseCategory;
-*/
+    @Enumerated(EnumType.STRING)
+    @Column(name = "license_category", nullable = false)
+    private LicenseCategory licenseCategory;
+
 }

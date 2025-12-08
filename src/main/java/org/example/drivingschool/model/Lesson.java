@@ -42,10 +42,9 @@ public class Lesson {
     @Column(name = "updated_at")
     private Instant updatedAt;
 
-/*
- TODO [Reverse Engineering] create field to map the 'type' column
- Available actions: Define target Java type | Uncomment as is | Remove column mapping
-    @Column(name = "type", columnDefinition = "lesson_type not null")
-    private Object type;
-*/
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    @Column(name = "type", nullable = false)
+    private LessonType type;
+
 }
