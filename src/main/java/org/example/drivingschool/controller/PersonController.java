@@ -1,14 +1,45 @@
 package org.example.drivingschool.controller;
 
 import org.example.drivingschool.service.PersonService;
+import org.openapitools.api.PersonsApi;
+import org.openapitools.model.Person;
+import org.openapitools.model.PersonCreate;
+import org.openapitools.model.PersonUpdate;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
-public class PersonController {
+@RequestMapping("api/v1/persons")
+public class PersonController implements PersonsApi {
 
     private final PersonService personService;
 
     public PersonController(PersonService personService) {
         this.personService = personService;
+    }
+
+    @Override
+    public ResponseEntity<Person> createPerson(PersonCreate personCreate) {
+        return null;
+    }
+
+    @Override
+    public ResponseEntity<Person> getPersonById(Integer id) {
+        return null;
+    }
+
+    @Override
+    @GetMapping
+    public ResponseEntity<List<Person>> listPersons() {
+        return ResponseEntity.ok(personService.list());
+    }
+
+    @Override
+    public ResponseEntity<Person> updatePerson(Integer id, PersonUpdate personUpdate) {
+        return null;
     }
 }
