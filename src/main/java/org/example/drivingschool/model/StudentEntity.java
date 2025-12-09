@@ -11,8 +11,8 @@ import java.time.Instant;
 @Getter
 @Setter
 @Entity
-@Table(name = "instructor")
-public class Instructor {
+@Table(name = "student")
+public class StudentEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
@@ -21,7 +21,7 @@ public class Instructor {
     @NotNull
     @OneToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "person_id", nullable = false)
-    private Person person;
+    private PersonEntity person;
 
     @NotNull
     @ColumnDefault("false")
@@ -29,18 +29,10 @@ public class Instructor {
     private Boolean isCompliant = false;
 
     @NotNull
-    @ColumnDefault("true")
-    @Column(name = "is_active", nullable = false)
-    private Boolean isActive = false;
-
-    @NotNull
     @Column(name = "created_at", nullable = false)
     private Instant createdAt;
+
     @Column(name = "updated_at")
     private Instant updatedAt;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "license_category", nullable = false)
-    private LicenseCategory licenseCategory;
 
 }
