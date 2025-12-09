@@ -7,6 +7,7 @@ import org.openapitools.model.PersonCreate;
 import org.openapitools.model.PersonUpdate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -28,8 +29,9 @@ public class PersonController implements PersonsApi {
     }
 
     @Override
-    public ResponseEntity<Person> getPersonById(Integer id) {
-        return null;
+    @GetMapping("/{id}")
+    public ResponseEntity<Person> getPersonById(@PathVariable Integer id) {
+        return ResponseEntity.ok(personService.getById(id));
     }
 
     @Override

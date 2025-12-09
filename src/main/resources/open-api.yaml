@@ -1409,6 +1409,8 @@ components:
     Error:
       type: object
       properties:
+        status:
+          type: integer
         code:
           type: string
         message:
