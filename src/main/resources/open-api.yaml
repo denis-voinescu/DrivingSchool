@@ -1409,12 +1409,18 @@ components:
     Error:
       type: object
       properties:
-        status:
-          type: integer
         code:
           type: string
         message:
           type: string
+        status:
+          type: integer
+        timestamp:
+          type: string
+          format: date-time
       required:
         - code
         - message
+        - status
+        - timestamp
+
