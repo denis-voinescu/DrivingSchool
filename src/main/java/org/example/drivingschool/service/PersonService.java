@@ -1,5 +1,6 @@
 package org.example.drivingschool.service;
 
+import org.example.drivingschool.exception.PersonNotFoundException;
 import org.example.drivingschool.mapper.PersonMapper;
 import org.example.drivingschool.model.PersonEntity;
 import org.example.drivingschool.repository.PersonRepository;
@@ -29,5 +30,12 @@ public class PersonService {
                 .stream()
                 .map(personMapper::toDto)
                 .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public Person getById(Integer id) {
+        PersonEntity entity = personRepository.findById(id)
+                .orElseThrow(() -> new PersonNotFoundException(id));
+        return personMapper.toDto(entity);
     }
 }
