@@ -7,41 +7,40 @@ import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
 
 import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalTime;
 
 @Getter
 @Setter
 @Entity
-@Table(name = "exam")
-public class Exam {
+@Table(name = "instructor")
+public class InstructorEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Integer id;
 
     @NotNull
-    @Column(name = "date", nullable = false)
-    private LocalDate date;
-
-    @NotNull
-    @Column(name = "hour", nullable = false)
-    private LocalTime hour;
-
-    @NotNull
-    @Column(name = "location", nullable = false, length = Integer.MAX_VALUE)
-    private String location;
+    @OneToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "person_id", nullable = false)
+    private PersonEntity person;
 
     @NotNull
     @ColumnDefault("false")
-    @Column(name = "completed", nullable = false)
-    private Boolean completed = false;
+    @Column(name = "is_compliant", nullable = false)
+    private Boolean isCompliant = false;
+
+    @NotNull
+    @ColumnDefault("true")
+    @Column(name = "is_active", nullable = false)
+    private Boolean isActive = false;
 
     @NotNull
     @Column(name = "created_at", nullable = false)
     private Instant createdAt;
-
     @Column(name = "updated_at")
     private Instant updatedAt;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "license_category", nullable = false)
+    private LicenseCategory licenseCategory;
 
 }

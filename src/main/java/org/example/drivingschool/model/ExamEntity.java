@@ -8,24 +8,25 @@ import org.hibernate.annotations.ColumnDefault;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalTime;
 
 @Getter
 @Setter
 @Entity
-@Table(name = "lesson")
-public class Lesson {
+@Table(name = "exam")
+public class ExamEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Integer id;
 
     @NotNull
-    @Column(name = "count", nullable = false)
-    private Integer count;
-
-    @NotNull
     @Column(name = "date", nullable = false)
     private LocalDate date;
+
+    @NotNull
+    @Column(name = "hour", nullable = false)
+    private LocalTime hour;
 
     @NotNull
     @Column(name = "location", nullable = false, length = Integer.MAX_VALUE)
@@ -39,12 +40,8 @@ public class Lesson {
     @NotNull
     @Column(name = "created_at", nullable = false)
     private Instant createdAt;
+
     @Column(name = "updated_at")
     private Instant updatedAt;
-
-    @NotNull
-    @Enumerated(EnumType.STRING)
-    @Column(name = "type", nullable = false)
-    private LessonType type;
 
 }
