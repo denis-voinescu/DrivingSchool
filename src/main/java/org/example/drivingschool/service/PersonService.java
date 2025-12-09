@@ -1,15 +1,14 @@
 package org.example.drivingschool.service;
 
-import org.example.drivingschool.exception.PersonNotFoundException;
+import org.example.drivingschool.exception.InvalidIdException;
+import org.example.drivingschool.exception.ResourceNotFoundException;
 import org.example.drivingschool.mapper.PersonMapper;
 import org.example.drivingschool.model.PersonEntity;
 import org.example.drivingschool.repository.PersonRepository;
 import org.openapitools.model.Person;
-import org.openapitools.model.PersonCreate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Instant;
 import java.util.List;
 
 @Service
@@ -25,17 +24,25 @@ public class PersonService {
 
     @Transactional(readOnly = true)
     public List<Person> list() {
+
         return personRepository
                 .findAll()
                 .stream()
                 .map(personMapper::toDto)
                 .toList();
+
     }
 
     @Transactional(readOnly = true)
     public Person getById(Integer id) {
+
+        if(id == null || id <= 0) {
+            throw new InvalidIdException();
+        }
+
         PersonEntity entity = personRepository.findById(id)
-                .orElseThrow(() -> new PersonNotFoundException(id));
+                .orElseThrow(() -> new ResourceNotFoundException(id));
+
         return personMapper.toDto(entity);
     }
 }
