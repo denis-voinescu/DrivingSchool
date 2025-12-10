@@ -4,24 +4,27 @@ import org.example.drivingschool.exception.InvalidIdException;
 import org.example.drivingschool.exception.ResourceNotFoundException;
 import org.example.drivingschool.mapper.InstructorMapper;
 import org.example.drivingschool.model.InstructorEntity;
-import org.example.drivingschool.model.PersonEntity;
 import org.example.drivingschool.repository.InstructorRepository;
+import org.example.drivingschool.repository.PersonRepository;
 import org.openapitools.model.Instructor;
-import org.openapitools.model.Person;
+import org.openapitools.model.InstructorCreate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.util.List;
 
 @Service
 public class InstructorService {
 
     private final InstructorRepository instructorRepository;
+    private final PersonRepository personRepository;
     private final InstructorMapper instructorMapper;
 
-    public InstructorService(InstructorRepository instructorRepository, InstructorMapper instructorMapper) {
+    public InstructorService(InstructorRepository instructorRepository, PersonRepository personRepository, InstructorMapper instructorMapper) {
         this.instructorRepository = instructorRepository;
         this.instructorMapper = instructorMapper;
+        this.personRepository = personRepository;
     }
 
     @Transactional(readOnly = true)
@@ -42,5 +45,21 @@ public class InstructorService {
 
         return instructorMapper.toDto(entity);
     }
+
+    public Instructor create(InstructorCreate instructorCreate) {
+
+        InstructorEntity instructorEntity = instructorMapper.toEntity(instructorCreate);
+
+        instructorEntity.setPerson(
+                personRepository.findById(instructorCreate.getPersonId())
+                        .orElseThrow(() -> new ResourceNotFoundException(instructorCreate.getPersonId()))
+        );
+
+        instructorEntity.setCreatedAt(Instant.now());
+        InstructorEntity saved = instructorRepository.save(instructorEntity);
+
+        return instructorMapper.toDto(saved);
+    }
+
 
 }
