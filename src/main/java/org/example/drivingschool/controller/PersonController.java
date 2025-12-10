@@ -1,15 +1,13 @@
 package org.example.drivingschool.controller;
 
+import jakarta.validation.Valid;
 import org.example.drivingschool.service.PersonService;
 import org.openapitools.api.PersonsApi;
 import org.openapitools.model.Person;
 import org.openapitools.model.PersonCreate;
 import org.openapitools.model.PersonUpdate;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -24,8 +22,9 @@ public class PersonController implements PersonsApi {
     }
 
     @Override
-    public ResponseEntity<Person> createPerson(PersonCreate personCreate) {
-        return null;
+    @PostMapping
+    public ResponseEntity<Person> createPerson(@Valid @RequestBody PersonCreate personCreate) {
+        return ResponseEntity.ok(personService.create(personCreate));
     }
 
     @Override

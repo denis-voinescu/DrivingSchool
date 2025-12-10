@@ -6,9 +6,11 @@ import org.example.drivingschool.mapper.PersonMapper;
 import org.example.drivingschool.model.PersonEntity;
 import org.example.drivingschool.repository.PersonRepository;
 import org.openapitools.model.Person;
+import org.openapitools.model.PersonCreate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.util.List;
 
 @Service
@@ -45,4 +47,15 @@ public class PersonService {
 
         return personMapper.toDto(entity);
     }
+
+
+    public Person create(PersonCreate personCreate) {
+
+        PersonEntity entity = personMapper.toEntity(personCreate);
+        entity.setCreatedAt(Instant.now());
+        PersonEntity saved = personRepository.save(entity);
+
+        return personMapper.toDto(saved);
+    }
+
 }
