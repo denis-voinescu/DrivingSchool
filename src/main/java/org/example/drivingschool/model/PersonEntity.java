@@ -11,7 +11,14 @@ import java.time.LocalDate;
 @Getter
 @Setter
 @Entity
-@Table(name = "person")
+@Table(
+        name = "person",
+        indexes = {
+                @Index(name = "person_pnc_uq", columnList = "pnc", unique = true),
+                @Index(name = "person_email_uq", columnList = "email_address", unique = true),
+                @Index(name = "person_phone_uq", columnList = "phone_number", unique = true)
+        }
+)
 public class PersonEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -19,7 +26,7 @@ public class PersonEntity {
     private Integer id;
 
     @NotNull
-    @Column(name = "pnc", nullable = false, length = Integer.MAX_VALUE)
+    @Column(name = "pnc", nullable = false, unique = true, length = 13)
     private String pnc;
 
     @NotNull
@@ -27,19 +34,19 @@ public class PersonEntity {
     private LocalDate dob;
 
     @NotNull
-    @Column(name = "first_name", nullable = false, length = Integer.MAX_VALUE)
+    @Column(name = "first_name", nullable = false, length = 50)
     private String firstName;
 
     @NotNull
-    @Column(name = "last_name", nullable = false, length = Integer.MAX_VALUE)
+    @Column(name = "last_name", nullable = false, length = 50)
     private String lastName;
 
     @NotNull
-    @Column(name = "email_address", nullable = false, length = Integer.MAX_VALUE)
+    @Column(name = "email_address", nullable = false, unique = true, length = 100)
     private String emailAddress;
 
     @NotNull
-    @Column(name = "phone_number", nullable = false, length = Integer.MAX_VALUE)
+    @Column(name = "phone_number", nullable = false, unique = true, length = 20)
     private String phoneNumber;
 
     @NotNull
@@ -48,5 +55,4 @@ public class PersonEntity {
 
     @Column(name = "updated_at")
     private Instant updatedAt;
-
 }
