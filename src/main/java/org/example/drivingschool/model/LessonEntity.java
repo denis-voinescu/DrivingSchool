@@ -20,6 +20,11 @@ public class LessonEntity {
     private Integer id;
 
     @NotNull
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "enrollment_id", nullable = false)
+    private EnrollmentEntity enrollment;
+
+    @NotNull
     @Column(name = "count", nullable = false)
     private Integer count;
 
@@ -46,5 +51,4 @@ public class LessonEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "type", nullable = false)
     private LessonType type;
-
 }

@@ -21,6 +21,11 @@ public class ExamEntity {
     private Integer id;
 
     @NotNull
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "enrollment_id", nullable = false)
+    private EnrollmentEntity enrollment;
+
+    @NotNull
     @Column(name = "date", nullable = false)
     private LocalDate date;
 
