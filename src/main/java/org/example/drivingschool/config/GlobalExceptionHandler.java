@@ -22,11 +22,11 @@ import java.util.List;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
-    public ResponseEntity<Error> handleMethodNotAllowed() {
+    public ResponseEntity<Error> handleMethodNotAllowed(HttpRequestMethodNotSupportedException ex) {
 
         Error err = new Error();
         err.setCode("METHOD_NOT_ALLOWED");
-        err.setMessage("HTTP request method not supported for this endpoint");
+        err.setMessage("HTTP request method '" + ex.getMethod() + "' not supported for this endpoint");
         err.setStatus(HttpStatus.METHOD_NOT_ALLOWED.value());
         err.setTimestamp(OffsetDateTime.now());
 
