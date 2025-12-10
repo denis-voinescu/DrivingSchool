@@ -7,6 +7,7 @@ import org.example.drivingschool.model.PersonEntity;
 import org.example.drivingschool.repository.PersonRepository;
 import org.openapitools.model.Person;
 import org.openapitools.model.PersonCreate;
+import org.openapitools.model.PersonUpdate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,35 +28,45 @@ public class PersonService {
     @Transactional(readOnly = true)
     public List<Person> list() {
 
-        return personRepository
-                .findAll()
-                .stream()
-                .map(personMapper::toDto)
-                .toList();
+        return personRepository.findAll().stream().map(personMapper::toDto).toList();
 
     }
 
     @Transactional(readOnly = true)
     public Person getById(Integer id) {
 
-        if(id == null || id <= 0) {
+        if (id == null || id <= 0) {
             throw new InvalidIdException();
         }
 
-        PersonEntity entity = personRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(id));
+        PersonEntity entity = personRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(id));
 
         return personMapper.toDto(entity);
     }
 
-
     public Person create(PersonCreate personCreate) {
 
-        PersonEntity entity = personMapper.toEntity(personCreate);
-        entity.setCreatedAt(Instant.now());
-        PersonEntity saved = personRepository.save(entity);
+        PersonEntity personEntity = personMapper.toEntity(personCreate);
+        personEntity.setCreatedAt(Instant.now());
+        PersonEntity savedPersonEntity = personRepository.save(personEntity);
 
+        return personMapper.toDto(savedPersonEntity);
+    }
+
+    public Person update(Integer id, PersonUpdate patch) {
+
+        if (id == null || id <= 0) {
+            throw new InvalidIdException();
+        }
+
+        PersonEntity entity = personRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(id));
+
+        personMapper.updateEntity(entity, patch);
+        entity.setUpdatedAt(Instant.now());
+
+        PersonEntity saved = personRepository.save(entity);
         return personMapper.toDto(saved);
     }
+
 
 }
