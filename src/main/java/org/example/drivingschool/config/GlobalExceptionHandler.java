@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -19,6 +20,18 @@ import java.util.List;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public ResponseEntity<Error> handleMethodNotAllowed() {
+
+        Error err = new Error();
+        err.setCode("METHOD_NOT_ALLOWED");
+        err.setMessage("HTTP request method not supported for this endpoint");
+        err.setStatus(HttpStatus.METHOD_NOT_ALLOWED.value());
+        err.setTimestamp(OffsetDateTime.now());
+
+        return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body(err);
+    }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<Error> handleBadJson() {
@@ -63,16 +76,10 @@ public class GlobalExceptionHandler {
     }
 
 
-
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Error> handleRequestBodyFormat(MethodArgumentNotValidException ex) {
 
-        List<String> fields = ex.getBindingResult()
-                .getFieldErrors()
-                .stream()
-                .map(FieldError::getField)
-                .distinct()
-                .toList();
+        List<String> fields = ex.getBindingResult().getFieldErrors().stream().map(FieldError::getField).distinct().toList();
 
         String expression;
         switch (fields.size()) {
@@ -82,7 +89,7 @@ public class GlobalExceptionHandler {
 
         Error err = new Error();
         err.setCode("INVALID_REQUEST_BODY");
-        err.setMessage("[" + String.join(", ", fields) +"] " + expression + " missing or invalid");
+        err.setMessage("[" + String.join(", ", fields) + "] " + expression + " missing or invalid");
         err.setStatus(HttpStatus.BAD_REQUEST.value());
         err.setTimestamp(OffsetDateTime.now());
 

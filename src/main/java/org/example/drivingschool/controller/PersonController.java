@@ -40,7 +40,8 @@ public class PersonController implements PersonsApi {
     }
 
     @Override
-    public ResponseEntity<Person> updatePerson(Integer id, PersonUpdate personUpdate) {
-        return null;
+    @PatchMapping("/{id}")
+    public ResponseEntity<Person> updatePerson(@PathVariable Integer id, PersonUpdate personUpdate) {
+        return ResponseEntity.ok(personService.update(id, personUpdate));
     }
 }
