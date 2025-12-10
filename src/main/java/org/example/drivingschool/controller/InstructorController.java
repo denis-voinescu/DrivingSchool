@@ -1,13 +1,11 @@
 package org.example.drivingschool.controller;
 
+import jakarta.validation.Valid;
 import org.example.drivingschool.service.InstructorService;
 import org.openapitools.api.InstructorsApi;
 import org.openapitools.model.*;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -23,8 +21,9 @@ public class InstructorController implements InstructorsApi {
     }
 
     @Override
-    public ResponseEntity<Instructor> createInstructor(InstructorCreate instructorCreate) {
-        return null;
+    @PostMapping
+    public ResponseEntity<Instructor> createInstructor(@Valid @RequestBody InstructorCreate instructorCreate) {
+        return ResponseEntity.ok(instructorService.create(instructorCreate));
     }
 
     @Override

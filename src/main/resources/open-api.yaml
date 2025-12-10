@@ -1131,6 +1131,10 @@ components:
           type: integer
         license_category:
           $ref: '#/components/schemas/LicenseCategory'
+        is_compliant:
+          type: boolean
+        is_active:
+          type: boolean
       required:
         - person_id
         - license_category
@@ -1423,4 +1427,3 @@ components:
         - message
         - status
         - timestamp
-
