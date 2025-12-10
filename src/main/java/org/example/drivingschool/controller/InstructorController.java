@@ -5,6 +5,7 @@ import org.openapitools.api.InstructorsApi;
 import org.openapitools.model.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -27,8 +28,10 @@ public class InstructorController implements InstructorsApi {
     }
 
     @Override
-    public ResponseEntity<Instructor> getInstructorById(Integer id) {
-        return null;
+    @GetMapping("/{id}")
+    public ResponseEntity<Instructor> getInstructorById(@PathVariable Integer id) {
+        return ResponseEntity.ok(instructorService.getById(id));
+
     }
 
     @Override
