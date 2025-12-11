@@ -55,7 +55,8 @@ public class InstructorController implements InstructorsApi {
     }
 
     @Override
+    @PatchMapping("/{id}")
     public ResponseEntity<Instructor> updateInstructor(Integer id, InstructorUpdate instructorUpdate) {
-        return null;
+        return ResponseEntity.ok(instructorService.update(id, instructorUpdate));
     }
 }
