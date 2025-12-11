@@ -12,20 +12,22 @@ import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 
-@Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+@Mapper(
+    componentModel = "spring",
+    nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface PersonMapper {
 
-    PersonEntity toEntity(PersonCreate dto);
+  PersonEntity toEntity(PersonCreate dto);
 
-    Person toDto(PersonEntity entity);
+  Person toDto(PersonEntity entity);
 
-    void updateEntity(@MappingTarget PersonEntity entity, PersonUpdate dto);
+  void updateEntity(@MappingTarget PersonEntity entity, PersonUpdate dto);
 
-    default OffsetDateTime map(Instant value) {
-        return value == null ? null : value.atOffset(ZoneOffset.UTC);
-    }
+  default OffsetDateTime map(Instant value) {
+    return value == null ? null : value.atOffset(ZoneOffset.UTC);
+  }
 
-    default Instant map(OffsetDateTime value) {
-        return value == null ? null : value.toInstant();
-    }
+  default Instant map(OffsetDateTime value) {
+    return value == null ? null : value.toInstant();
+  }
 }

@@ -12,10 +12,13 @@ import java.util.List;
 
 @Repository
 public interface LessonRepository extends JpaRepository<LessonEntity, Integer> {
-    Integer countByEnrollment(EnrollmentEntity enrollment);
-    List<LessonEntity> findByEnrollmentInstructor(InstructorEntity instructor);
-    List<LessonEntity> findByEnrollmentInstructorAndDate(InstructorEntity instructor, LocalDate date);
-    List<LessonEntity> findByEnrollmentStudent(StudentEntity student);
+  Integer countByEnrollment(EnrollmentEntity enrollment);
 
-    List<LessonEntity> findByEnrollmentStudentAndCompleted(StudentEntity student, Boolean completed);
+  List<LessonEntity> findByEnrollmentInstructor(InstructorEntity instructor);
+
+  List<LessonEntity> findByEnrollmentInstructorAndDate(InstructorEntity instructor, LocalDate date);
+
+  List<LessonEntity> findByEnrollmentStudent(StudentEntity student);
+
+  List<LessonEntity> findByEnrollmentStudentAndCompleted(StudentEntity student, Boolean completed);
 }

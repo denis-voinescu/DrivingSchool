@@ -24,102 +24,117 @@ import java.util.List;
 @Service
 public class LessonService {
 
-    private final LessonRepository lessonRepository;
-    private final EnrollmentRepository enrollmentRepository;
-    private final LessonMapper lessonMapper;
-    private final InstructorRepository instructorRepository;
-    private final StudentRepository studentRepository;
+  private final LessonRepository lessonRepository;
+  private final EnrollmentRepository enrollmentRepository;
+  private final LessonMapper lessonMapper;
+  private final InstructorRepository instructorRepository;
+  private final StudentRepository studentRepository;
 
-    public LessonService(StudentRepository studentRepository ,LessonRepository lessonRepository, EnrollmentRepository enrollmentRepository, LessonMapper lessonMapper, InstructorRepository instructorRepository) {
-        this.lessonRepository = lessonRepository;
-        this.enrollmentRepository = enrollmentRepository;
-        this.lessonMapper = lessonMapper;
-        this.instructorRepository = instructorRepository;
-        this.studentRepository = studentRepository;
+  public LessonService(
+      StudentRepository studentRepository,
+      LessonRepository lessonRepository,
+      EnrollmentRepository enrollmentRepository,
+      LessonMapper lessonMapper,
+      InstructorRepository instructorRepository) {
+    this.lessonRepository = lessonRepository;
+    this.enrollmentRepository = enrollmentRepository;
+    this.lessonMapper = lessonMapper;
+    this.instructorRepository = instructorRepository;
+    this.studentRepository = studentRepository;
+  }
+
+  @Transactional(readOnly = true)
+  public List<Lesson> list(LocalDate date) {
+    return lessonRepository.findAll().stream().map(lessonMapper::toDto).toList();
+  }
+
+  @Transactional(readOnly = true)
+  public Lesson getById(Integer id) {
+    if (id == null || id <= 0) {
+      throw new InvalidIdException();
     }
 
-    @Transactional(readOnly = true)
-    public List<Lesson> list(LocalDate date) {
-        return lessonRepository.findAll().stream().map(lessonMapper::toDto).toList();
+    LessonEntity entity =
+        lessonRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(id));
+
+    return lessonMapper.toDto(entity);
+  }
+
+  public Lesson createForEnrollment(Integer enrollmentId, LessonCreate lessonCreate) {
+    if (enrollmentId == null || enrollmentId <= 0) {
+      throw new InvalidIdException();
     }
 
-    @Transactional(readOnly = true)
-    public Lesson getById(Integer id) {
-        if (id == null || id <= 0) {
-            throw new InvalidIdException();
-        }
+    EnrollmentEntity enrollment =
+        enrollmentRepository
+            .findById(enrollmentId)
+            .orElseThrow(() -> new ResourceNotFoundException(enrollmentId));
 
-        LessonEntity entity = lessonRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(id));
+    LessonEntity entity = lessonMapper.toEntity(lessonCreate);
+    entity.setEnrollment(enrollment);
+    entity.setCreatedAt(Instant.now());
 
-        return lessonMapper.toDto(entity);
+    Integer nextCount = lessonRepository.countByEnrollment(enrollment) + 1;
+    entity.setCount(nextCount);
+
+    LessonEntity saved = lessonRepository.save(entity);
+    return lessonMapper.toDto(saved);
+  }
+
+  public Lesson update(Integer id, LessonUpdate patch) {
+    if (id == null || id <= 0) {
+      throw new InvalidIdException();
     }
 
-    public Lesson createForEnrollment(Integer enrollmentId, LessonCreate lessonCreate) {
-        if (enrollmentId == null || enrollmentId <= 0) {
-            throw new InvalidIdException();
-        }
+    LessonEntity entity =
+        lessonRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(id));
 
-        EnrollmentEntity enrollment = enrollmentRepository.findById(enrollmentId).orElseThrow(() -> new ResourceNotFoundException(enrollmentId));
+    lessonMapper.updateEntity(entity, patch);
+    entity.setUpdatedAt(Instant.now());
 
-        LessonEntity entity = lessonMapper.toEntity(lessonCreate);
-        entity.setEnrollment(enrollment);
-        entity.setCreatedAt(Instant.now());
+    LessonEntity saved = lessonRepository.save(entity);
+    return lessonMapper.toDto(saved);
+  }
 
-        Integer nextCount = lessonRepository.countByEnrollment(enrollment) + 1;
-        entity.setCount(nextCount);
-
-        LessonEntity saved = lessonRepository.save(entity);
-        return lessonMapper.toDto(saved);
+  public List<Lesson> listForInstructor(Integer instructorId, LocalDate date) {
+    if (instructorId == null || instructorId <= 0) {
+      throw new InvalidIdException();
     }
 
-    public Lesson update(Integer id, LessonUpdate patch) {
-        if (id == null || id <= 0) {
-            throw new InvalidIdException();
-        }
+    InstructorEntity instructor =
+        instructorRepository
+            .findById(instructorId)
+            .orElseThrow(() -> new ResourceNotFoundException(instructorId));
 
-        LessonEntity entity = lessonRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(id));
+    List<LessonEntity> entities;
 
-        lessonMapper.updateEntity(entity, patch);
-        entity.setUpdatedAt(Instant.now());
-
-        LessonEntity saved = lessonRepository.save(entity);
-        return lessonMapper.toDto(saved);
+    if (date == null) {
+      entities = lessonRepository.findByEnrollmentInstructor(instructor);
+    } else {
+      entities = lessonRepository.findByEnrollmentInstructorAndDate(instructor, date);
     }
 
-    public List<Lesson> listForInstructor(Integer instructorId, LocalDate date) {
-        if (instructorId == null || instructorId <= 0) {
-            throw new InvalidIdException();
-        }
+    return entities.stream().map(lessonMapper::toDto).toList();
+  }
 
-        InstructorEntity instructor = instructorRepository.findById(instructorId).orElseThrow(() -> new ResourceNotFoundException(instructorId));
-
-        List<LessonEntity> entities;
-
-        if (date == null) {
-            entities = lessonRepository.findByEnrollmentInstructor(instructor);
-        } else {
-            entities = lessonRepository.findByEnrollmentInstructorAndDate(instructor, date);
-        }
-
-        return entities.stream().map(lessonMapper::toDto).toList();
+  public List<Lesson> listForStudent(Integer studentId, Boolean completed) {
+    if (studentId == null || studentId <= 0) {
+      throw new InvalidIdException();
     }
 
-    public List<Lesson> listForStudent(Integer studentId, Boolean completed) {
-        if (studentId == null || studentId <= 0) {
-            throw new InvalidIdException();
-        }
+    StudentEntity student =
+        studentRepository
+            .findById(studentId)
+            .orElseThrow(() -> new ResourceNotFoundException(studentId));
 
-        StudentEntity student = studentRepository.findById(studentId).orElseThrow(() -> new ResourceNotFoundException(studentId));
+    List<LessonEntity> entities;
 
-        List<LessonEntity> entities;
-
-        if (completed == null) {
-            entities = lessonRepository.findByEnrollmentStudent(student);
-        } else {
-            entities = lessonRepository.findByEnrollmentStudentAndCompleted(student, completed);
-        }
-
-        return entities.stream().map(lessonMapper::toDto).toList();
+    if (completed == null) {
+      entities = lessonRepository.findByEnrollmentStudent(student);
+    } else {
+      entities = lessonRepository.findByEnrollmentStudentAndCompleted(student, completed);
     }
 
+    return entities.stream().map(lessonMapper::toDto).toList();
+  }
 }

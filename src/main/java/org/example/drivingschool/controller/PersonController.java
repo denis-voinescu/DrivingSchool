@@ -15,33 +15,33 @@ import java.util.List;
 @RequestMapping("api/v1/persons")
 public class PersonController implements PersonsApi {
 
-    private final PersonService personService;
+  private final PersonService personService;
 
-    public PersonController(PersonService personService) {
-        this.personService = personService;
-    }
+  public PersonController(PersonService personService) {
+    this.personService = personService;
+  }
 
-    @Override
-    @PostMapping
-    public ResponseEntity<Person> createPerson(@Valid @RequestBody PersonCreate personCreate) {
-        return ResponseEntity.ok(personService.create(personCreate));
-    }
+  @Override
+  @PostMapping
+  public ResponseEntity<Person> createPerson(@Valid @RequestBody PersonCreate personCreate) {
+    return ResponseEntity.ok(personService.create(personCreate));
+  }
 
-    @Override
-    @GetMapping("/{id}")
-    public ResponseEntity<Person> getPersonById(@PathVariable Integer id) {
-        return ResponseEntity.ok(personService.getById(id));
-    }
+  @Override
+  @GetMapping("/{id}")
+  public ResponseEntity<Person> getPersonById(@PathVariable Integer id) {
+    return ResponseEntity.ok(personService.getById(id));
+  }
 
-    @Override
-    @GetMapping
-    public ResponseEntity<List<Person>> listPersons() {
-        return ResponseEntity.ok(personService.list());
-    }
+  @Override
+  @GetMapping
+  public ResponseEntity<List<Person>> listPersons() {
+    return ResponseEntity.ok(personService.list());
+  }
 
-    @Override
-    @PatchMapping("/{id}")
-    public ResponseEntity<Person> updatePerson(@PathVariable Integer id, PersonUpdate personUpdate) {
-        return ResponseEntity.ok(personService.update(id, personUpdate));
-    }
+  @Override
+  @PatchMapping("/{id}")
+  public ResponseEntity<Person> updatePerson(@PathVariable Integer id, PersonUpdate personUpdate) {
+    return ResponseEntity.ok(personService.update(id, personUpdate));
+  }
 }

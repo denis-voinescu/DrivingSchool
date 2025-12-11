@@ -20,84 +20,87 @@ import java.util.List;
 @Service
 public class ExamService {
 
-    private final ExamRepository examRepository;
-    private final ExamMapper examMapper;
-    private final EnrollmentRepository enrollmentRepository;
+  private final ExamRepository examRepository;
+  private final ExamMapper examMapper;
+  private final EnrollmentRepository enrollmentRepository;
 
-    public ExamService(ExamRepository examRepository, ExamMapper examMapper, EnrollmentRepository enrollmentRepository) {
-        this.examRepository = examRepository;
-        this.examMapper = examMapper;
-        this.enrollmentRepository = enrollmentRepository;
+  public ExamService(
+      ExamRepository examRepository,
+      ExamMapper examMapper,
+      EnrollmentRepository enrollmentRepository) {
+    this.examRepository = examRepository;
+    this.examMapper = examMapper;
+    this.enrollmentRepository = enrollmentRepository;
+  }
+
+  @Transactional(readOnly = true)
+  public List<Exam> list(LocalDate date) {
+    return examRepository.findAll().stream().map(examMapper::toDto).toList();
+  }
+
+  @Transactional(readOnly = true)
+  public Exam getById(Integer id) {
+    if (id == null || id <= 0) {
+      throw new InvalidIdException();
     }
 
-    @Transactional(readOnly = true)
-    public List<Exam> list(LocalDate date) {
-        return examRepository.findAll()
-                .stream()
-                .map(examMapper::toDto)
-                .toList();
+    ExamEntity entity =
+        examRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(id));
+
+    return examMapper.toDto(entity);
+  }
+
+  public Exam create(ExamCreate examCreate) {
+    ExamEntity entity = examMapper.toEntity(examCreate);
+    entity.setCreatedAt(Instant.now());
+    ExamEntity saved = examRepository.save(entity);
+    return examMapper.toDto(saved);
+  }
+
+  public Exam update(Integer id, ExamUpdate patch) {
+    if (id == null || id <= 0) {
+      throw new InvalidIdException();
     }
 
-    @Transactional(readOnly = true)
-    public Exam getById(Integer id) {
-        if (id == null || id <= 0) {
-            throw new InvalidIdException();
-        }
+    ExamEntity entity =
+        examRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(id));
 
-        ExamEntity entity = examRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(id));
+    examMapper.updateEntity(entity, patch);
+    entity.setUpdatedAt(Instant.now());
 
-        return examMapper.toDto(entity);
+    ExamEntity saved = examRepository.save(entity);
+    return examMapper.toDto(saved);
+  }
+
+  public Exam createForEnrollment(Integer enrollmentId, ExamCreate examCreate) {
+    if (enrollmentId == null || enrollmentId <= 0) {
+      throw new InvalidIdException();
     }
 
-    public Exam create(ExamCreate examCreate) {
-        ExamEntity entity = examMapper.toEntity(examCreate);
-        entity.setCreatedAt(Instant.now());
-        ExamEntity saved = examRepository.save(entity);
-        return examMapper.toDto(saved);
+    EnrollmentEntity enrollment =
+        enrollmentRepository
+            .findById(enrollmentId)
+            .orElseThrow(() -> new ResourceNotFoundException(enrollmentId));
+
+    ExamEntity entity = examMapper.toEntity(examCreate);
+    entity.setEnrollment(enrollment);
+    entity.setCreatedAt(Instant.now());
+
+    ExamEntity saved = examRepository.save(entity);
+    return examMapper.toDto(saved);
+  }
+
+  public List<Exam> listByEnrollment(Integer enrollmentId) {
+    if (enrollmentId == null || enrollmentId <= 0) {
+      throw new InvalidIdException();
     }
 
-    public Exam update(Integer id, ExamUpdate patch) {
-        if (id == null || id <= 0) {
-            throw new InvalidIdException();
-        }
+    EnrollmentEntity enrollment =
+        enrollmentRepository
+            .findById(enrollmentId)
+            .orElseThrow(() -> new ResourceNotFoundException(enrollmentId));
 
-        ExamEntity entity = examRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(id));
-
-        examMapper.updateEntity(entity, patch);
-        entity.setUpdatedAt(Instant.now());
-
-        ExamEntity saved = examRepository.save(entity);
-        return examMapper.toDto(saved);
-    }
-
-    public Exam createForEnrollment(Integer enrollmentId, ExamCreate examCreate) {
-        if (enrollmentId == null || enrollmentId <= 0) {
-            throw new InvalidIdException();
-        }
-
-        EnrollmentEntity enrollment = enrollmentRepository.findById(enrollmentId)
-                .orElseThrow(() -> new ResourceNotFoundException(enrollmentId));
-
-        ExamEntity entity = examMapper.toEntity(examCreate);
-        entity.setEnrollment(enrollment);
-        entity.setCreatedAt(Instant.now());
-
-        ExamEntity saved = examRepository.save(entity);
-        return examMapper.toDto(saved);
-    }
-    public List<Exam> listByEnrollment(Integer enrollmentId) {
-        if (enrollmentId == null || enrollmentId <= 0) {
-            throw new InvalidIdException();
-        }
-
-        EnrollmentEntity enrollment = enrollmentRepository.findById(enrollmentId)
-                .orElseThrow(() -> new ResourceNotFoundException(enrollmentId));
-
-        List<ExamEntity> entities = examRepository.findByEnrollment(enrollment);
-        return examMapper.toDtoList(entities);
-    }
-
-
+    List<ExamEntity> entities = examRepository.findByEnrollment(enrollment);
+    return examMapper.toDtoList(entities);
+  }
 }

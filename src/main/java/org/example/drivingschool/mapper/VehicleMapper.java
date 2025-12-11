@@ -13,20 +13,21 @@ import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 
 @Mapper(
-        componentModel = "spring",
-        nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE
-)
+    componentModel = "spring",
+    nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface VehicleMapper {
 
-    VehicleEntity toEntity(VehicleCreate dto);
-    Vehicle toDto(VehicleEntity entity);
-    void updateEntity(@MappingTarget VehicleEntity entity, VehicleUpdate dto);
+  VehicleEntity toEntity(VehicleCreate dto);
 
-    default OffsetDateTime map(Instant value) {
-        return value == null ? null : value.atOffset(ZoneOffset.UTC);
-    }
+  Vehicle toDto(VehicleEntity entity);
 
-    default Instant map(OffsetDateTime value) {
-        return value == null ? null : value.toInstant();
-    }
+  void updateEntity(@MappingTarget VehicleEntity entity, VehicleUpdate dto);
+
+  default OffsetDateTime map(Instant value) {
+    return value == null ? null : value.atOffset(ZoneOffset.UTC);
+  }
+
+  default Instant map(OffsetDateTime value) {
+    return value == null ? null : value.toInstant();
+  }
 }

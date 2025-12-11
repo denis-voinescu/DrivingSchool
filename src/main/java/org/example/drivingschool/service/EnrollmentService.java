@@ -23,102 +23,111 @@ import java.util.List;
 @Service
 public class EnrollmentService {
 
-    private final EnrollmentRepository enrollmentRepository;
-    private final StudentRepository studentRepository;
-    private final InstructorRepository instructorRepository;
-    private final VehicleRepository vehicleRepository;
-    private final EnrollmentMapper enrollmentMapper;
+  private final EnrollmentRepository enrollmentRepository;
+  private final StudentRepository studentRepository;
+  private final InstructorRepository instructorRepository;
+  private final VehicleRepository vehicleRepository;
+  private final EnrollmentMapper enrollmentMapper;
 
-    public EnrollmentService(EnrollmentRepository enrollmentRepository,
-                             StudentRepository studentRepository,
-                             InstructorRepository instructorRepository,
-                             VehicleRepository vehicleRepository,
-                             EnrollmentMapper enrollmentMapper) {
-        this.enrollmentRepository = enrollmentRepository;
-        this.studentRepository = studentRepository;
-        this.instructorRepository = instructorRepository;
-        this.vehicleRepository = vehicleRepository;
-        this.enrollmentMapper = enrollmentMapper;
+  public EnrollmentService(
+      EnrollmentRepository enrollmentRepository,
+      StudentRepository studentRepository,
+      InstructorRepository instructorRepository,
+      VehicleRepository vehicleRepository,
+      EnrollmentMapper enrollmentMapper) {
+    this.enrollmentRepository = enrollmentRepository;
+    this.studentRepository = studentRepository;
+    this.instructorRepository = instructorRepository;
+    this.vehicleRepository = vehicleRepository;
+    this.enrollmentMapper = enrollmentMapper;
+  }
+
+  @Transactional(readOnly = true)
+  public List<Enrollment> list() {
+    return enrollmentRepository.findAll().stream().map(enrollmentMapper::toDto).toList();
+  }
+
+  @Transactional(readOnly = true)
+  public Enrollment getById(Integer id) {
+    if (id == null || id <= 0) {
+      throw new InvalidIdException();
     }
 
-    @Transactional(readOnly = true)
-    public List<Enrollment> list() {
-        return enrollmentRepository.findAll()
-                .stream()
-                .map(enrollmentMapper::toDto)
-                .toList();
+    EnrollmentEntity entity =
+        enrollmentRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(id));
+
+    return enrollmentMapper.toDto(entity);
+  }
+
+  public Enrollment create(EnrollmentCreate enrollmentCreate) {
+
+    StudentEntity student =
+        studentRepository
+            .findById(enrollmentCreate.getStudentId())
+            .orElseThrow(() -> new ResourceNotFoundException(enrollmentCreate.getStudentId()));
+
+    InstructorEntity instructor =
+        instructorRepository
+            .findById(enrollmentCreate.getInstructorId())
+            .orElseThrow(() -> new ResourceNotFoundException(enrollmentCreate.getInstructorId()));
+
+    VehicleEntity vehicle =
+        vehicleRepository
+            .findById(enrollmentCreate.getVehicleId())
+            .orElseThrow(() -> new ResourceNotFoundException(enrollmentCreate.getVehicleId()));
+
+    EnrollmentEntity entity = enrollmentMapper.toEntity(enrollmentCreate);
+    entity.setStudent(student);
+    entity.setInstructor(instructor);
+    entity.setVehicle(vehicle);
+    entity.setCreatedAt(Instant.now());
+
+    EnrollmentEntity saved = enrollmentRepository.save(entity);
+    return enrollmentMapper.toDto(saved);
+  }
+
+  public Enrollment update(Integer id, EnrollmentUpdate patch) {
+    if (id == null || id <= 0) {
+      throw new InvalidIdException();
     }
 
-    @Transactional(readOnly = true)
-    public Enrollment getById(Integer id) {
-        if (id == null || id <= 0) {
-            throw new InvalidIdException();
-        }
+    EnrollmentEntity entity =
+        enrollmentRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(id));
 
-        EnrollmentEntity entity = enrollmentRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(id));
-
-        return enrollmentMapper.toDto(entity);
+    if (patch.getInstructorId() != null) {
+      InstructorEntity instructor =
+          instructorRepository
+              .findById(patch.getInstructorId())
+              .orElseThrow(() -> new ResourceNotFoundException(patch.getInstructorId()));
+      entity.setInstructor(instructor);
     }
 
-    public Enrollment create(EnrollmentCreate enrollmentCreate) {
-
-        StudentEntity student = studentRepository.findById(enrollmentCreate.getStudentId())
-                .orElseThrow(() -> new ResourceNotFoundException(enrollmentCreate.getStudentId()));
-
-        InstructorEntity instructor = instructorRepository.findById(enrollmentCreate.getInstructorId())
-                .orElseThrow(() -> new ResourceNotFoundException(enrollmentCreate.getInstructorId()));
-
-        VehicleEntity vehicle = vehicleRepository.findById(enrollmentCreate.getVehicleId())
-                .orElseThrow(() -> new ResourceNotFoundException(enrollmentCreate.getVehicleId()));
-
-        EnrollmentEntity entity = enrollmentMapper.toEntity(enrollmentCreate);
-        entity.setStudent(student);
-        entity.setInstructor(instructor);
-        entity.setVehicle(vehicle);
-        entity.setCreatedAt(Instant.now());
-
-        EnrollmentEntity saved = enrollmentRepository.save(entity);
-        return enrollmentMapper.toDto(saved);
+    if (patch.getVehicleId() != null) {
+      VehicleEntity vehicle =
+          vehicleRepository
+              .findById(patch.getVehicleId())
+              .orElseThrow(() -> new ResourceNotFoundException(patch.getVehicleId()));
+      entity.setVehicle(vehicle);
     }
 
-    public Enrollment update(Integer id, EnrollmentUpdate patch) {
-        if (id == null || id <= 0) {
-            throw new InvalidIdException();
-        }
+    entity.setUpdatedAt(Instant.now());
 
-        EnrollmentEntity entity = enrollmentRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(id));
+    EnrollmentEntity saved = enrollmentRepository.save(entity);
+    return enrollmentMapper.toDto(saved);
+  }
 
-        if (patch.getInstructorId() != null) {
-            InstructorEntity instructor = instructorRepository.findById(patch.getInstructorId())
-                    .orElseThrow(() -> new ResourceNotFoundException(patch.getInstructorId()));
-            entity.setInstructor(instructor);
-        }
-
-        if (patch.getVehicleId() != null) {
-            VehicleEntity vehicle = vehicleRepository.findById(patch.getVehicleId())
-                    .orElseThrow(() -> new ResourceNotFoundException(patch.getVehicleId()));
-            entity.setVehicle(vehicle);
-        }
-
-        entity.setUpdatedAt(Instant.now());
-
-        EnrollmentEntity saved = enrollmentRepository.save(entity);
-        return enrollmentMapper.toDto(saved);
-    }
-    public List<Enrollment> listForStudent(Integer studentId) {
-        if (studentId == null || studentId <= 0) {
-            throw new InvalidIdException();
-        }
-
-        StudentEntity student = studentRepository.findById(studentId)
-                .orElseThrow(() -> new ResourceNotFoundException(studentId));
-
-        return enrollmentRepository.findByStudent(student)
-                .stream()
-                .map(enrollmentMapper::toDto)
-                .toList();
+  public List<Enrollment> listForStudent(Integer studentId) {
+    if (studentId == null || studentId <= 0) {
+      throw new InvalidIdException();
     }
 
+    StudentEntity student =
+        studentRepository
+            .findById(studentId)
+            .orElseThrow(() -> new ResourceNotFoundException(studentId));
+
+    return enrollmentRepository.findByStudent(student).stream()
+        .map(enrollmentMapper::toDto)
+        .toList();
+  }
 }
