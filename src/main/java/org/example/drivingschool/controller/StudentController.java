@@ -1,12 +1,13 @@
 package org.example.drivingschool.controller;
 
+import org.example.drivingschool.service.EnrollmentService;
+import org.example.drivingschool.service.LessonService;
 import org.example.drivingschool.service.StudentService;
 import org.openapitools.api.StudentsApi;
 import org.openapitools.model.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -14,9 +15,13 @@ import java.util.List;
 public class StudentController implements StudentsApi {
 
     private final StudentService studentService;
+    private final EnrollmentService enrollmentService;
+    private final LessonService lessonService;
 
-    public StudentController(StudentService studentService) {
+    public StudentController(LessonService lessonService, StudentService studentService, EnrollmentService enrollmentService) {
         this.studentService = studentService;
+        this.enrollmentService = enrollmentService;
+        this.lessonService = lessonService;
     }
 
     @Override
@@ -27,24 +32,25 @@ public class StudentController implements StudentsApi {
 
     @Override
     @GetMapping("/{id}")
-    public ResponseEntity<Student> getStudentById(Integer id) {
+    public ResponseEntity<Student> getStudentById(@PathVariable Integer id) {
         return ResponseEntity.ok(studentService.getById(id));
     }
 
     @Override
-    public ResponseEntity<List<Enrollment>> listStudentEnrollments(Integer id) {
-        return null;
+    @GetMapping("/{id}/enrollments")
+    public ResponseEntity<List<Enrollment>> listStudentEnrollments(@PathVariable Integer id) {
+        return ResponseEntity.ok(enrollmentService.listForStudent(id));
     }
 
     @Override
-    public ResponseEntity<List<Exam>> listStudentExams(Integer id, LocalDate from, LocalDate to) {
-        return null;
+    @GetMapping("/{id}/lessons")
+    public ResponseEntity<List<Lesson>> listStudentLessons(
+            @PathVariable Integer id,
+            @RequestParam(value = "completed", required = false) Boolean completed) {
+
+        return ResponseEntity.ok(lessonService.listForStudent(id, completed));
     }
 
-    @Override
-    public ResponseEntity<List<Lesson>> listStudentLessons(Integer id, Boolean completed) {
-        return null;
-    }
 
     @Override
     @PostMapping
@@ -54,7 +60,7 @@ public class StudentController implements StudentsApi {
 
     @Override
     @PatchMapping("/{id}")
-    public ResponseEntity<Student> updateStudent(Integer id, StudentUpdate studentUpdate) {
+    public ResponseEntity<Student> updateStudent(@PathVariable Integer id, StudentUpdate studentUpdate) {
         return ResponseEntity.ok(studentService.update(id, studentUpdate));
     }
 }

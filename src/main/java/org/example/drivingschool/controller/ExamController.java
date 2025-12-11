@@ -1,10 +1,8 @@
 package org.example.drivingschool.controller;
 
-import jakarta.validation.Valid;
 import org.example.drivingschool.service.ExamService;
 import org.openapitools.api.ExamsApi;
 import org.openapitools.model.Exam;
-import org.openapitools.model.ExamCreate;
 import org.openapitools.model.ExamUpdate;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -40,8 +38,7 @@ public class ExamController implements ExamsApi {
 
     @Override
     @PatchMapping("/{id}")
-    public ResponseEntity<Exam> updateExam(@PathVariable Integer id,
-                                           @Valid @RequestBody ExamUpdate examUpdate) {
+    public ResponseEntity<Exam> updateExam(@PathVariable Integer id, @RequestBody ExamUpdate examUpdate) {
         return ResponseEntity.ok(examService.update(id, examUpdate));
     }
 }

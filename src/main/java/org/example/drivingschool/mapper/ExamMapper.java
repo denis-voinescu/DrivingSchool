@@ -11,6 +11,7 @@ import org.openapitools.model.ExamUpdate;
 import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+import java.util.List;
 
 @Mapper(
         componentModel = "spring",
@@ -21,6 +22,8 @@ public interface ExamMapper {
     ExamEntity toEntity(ExamCreate dto);
     Exam toDto(ExamEntity entity);
     void updateEntity(@MappingTarget ExamEntity entity, ExamUpdate dto);
+    List<Exam> toDtoList(List<ExamEntity> entities);
+
 
     default OffsetDateTime map(Instant value) {
         return value == null ? null : value.atOffset(ZoneOffset.UTC);

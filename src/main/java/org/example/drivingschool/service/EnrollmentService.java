@@ -107,4 +107,18 @@ public class EnrollmentService {
         EnrollmentEntity saved = enrollmentRepository.save(entity);
         return enrollmentMapper.toDto(saved);
     }
+    public List<Enrollment> listForStudent(Integer studentId) {
+        if (studentId == null || studentId <= 0) {
+            throw new InvalidIdException();
+        }
+
+        StudentEntity student = studentRepository.findById(studentId)
+                .orElseThrow(() -> new ResourceNotFoundException(studentId));
+
+        return enrollmentRepository.findByStudent(student)
+                .stream()
+                .map(enrollmentMapper::toDto)
+                .toList();
+    }
+
 }

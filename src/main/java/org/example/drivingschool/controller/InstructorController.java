@@ -2,6 +2,7 @@ package org.example.drivingschool.controller;
 
 import jakarta.validation.Valid;
 import org.example.drivingschool.service.InstructorService;
+import org.example.drivingschool.service.LessonService;
 import org.openapitools.api.InstructorsApi;
 import org.openapitools.model.*;
 import org.springframework.http.ResponseEntity;
@@ -15,9 +16,11 @@ import java.util.List;
 public class InstructorController implements InstructorsApi {
 
     private final InstructorService instructorService;
+    private final LessonService lessonService;
 
-    public InstructorController(InstructorService instructorService) {
+    public InstructorController(InstructorService instructorService, LessonService lessonService) {
         this.instructorService = instructorService;
+        this.lessonService = lessonService;
     }
 
     @Override
@@ -34,19 +37,11 @@ public class InstructorController implements InstructorsApi {
     }
 
     @Override
-    public ResponseEntity<List<Enrollment>> listInstructorEnrollments(Integer id) {
-        return null;
-    }
-
-    @Override
-    public ResponseEntity<List<Exam>> listInstructorExams(Integer id, LocalDate from, LocalDate to) {
-        return null;
-    }
-
-    @Override
+    @GetMapping({"/{id}/lessons"})
     public ResponseEntity<List<Lesson>> listInstructorLessons(Integer id, LocalDate date) {
-        return null;
+        return ResponseEntity.ok(lessonService.listForInstructor(id, date));
     }
+
 
     @Override
     @GetMapping
@@ -56,7 +51,7 @@ public class InstructorController implements InstructorsApi {
 
     @Override
     @PatchMapping("/{id}")
-    public ResponseEntity<Instructor> updateInstructor(Integer id, InstructorUpdate instructorUpdate) {
+    public ResponseEntity<Instructor> updateInstructor(@PathVariable Integer id, InstructorUpdate instructorUpdate) {
         return ResponseEntity.ok(instructorService.update(id, instructorUpdate));
     }
 }

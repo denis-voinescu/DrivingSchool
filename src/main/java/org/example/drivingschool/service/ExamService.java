@@ -3,7 +3,9 @@ package org.example.drivingschool.service;
 import org.example.drivingschool.exception.InvalidIdException;
 import org.example.drivingschool.exception.ResourceNotFoundException;
 import org.example.drivingschool.mapper.ExamMapper;
+import org.example.drivingschool.model.EnrollmentEntity;
 import org.example.drivingschool.model.ExamEntity;
+import org.example.drivingschool.repository.EnrollmentRepository;
 import org.example.drivingschool.repository.ExamRepository;
 import org.openapitools.model.Exam;
 import org.openapitools.model.ExamCreate;
@@ -20,10 +22,12 @@ public class ExamService {
 
     private final ExamRepository examRepository;
     private final ExamMapper examMapper;
+    private final EnrollmentRepository enrollmentRepository;
 
-    public ExamService(ExamRepository examRepository, ExamMapper examMapper) {
+    public ExamService(ExamRepository examRepository, ExamMapper examMapper, EnrollmentRepository enrollmentRepository) {
         this.examRepository = examRepository;
         this.examMapper = examMapper;
+        this.enrollmentRepository = enrollmentRepository;
     }
 
     @Transactional(readOnly = true)
@@ -67,4 +71,33 @@ public class ExamService {
         ExamEntity saved = examRepository.save(entity);
         return examMapper.toDto(saved);
     }
+
+    public Exam createForEnrollment(Integer enrollmentId, ExamCreate examCreate) {
+        if (enrollmentId == null || enrollmentId <= 0) {
+            throw new InvalidIdException();
+        }
+
+        EnrollmentEntity enrollment = enrollmentRepository.findById(enrollmentId)
+                .orElseThrow(() -> new ResourceNotFoundException(enrollmentId));
+
+        ExamEntity entity = examMapper.toEntity(examCreate);
+        entity.setEnrollment(enrollment);
+        entity.setCreatedAt(Instant.now());
+
+        ExamEntity saved = examRepository.save(entity);
+        return examMapper.toDto(saved);
+    }
+    public List<Exam> listByEnrollment(Integer enrollmentId) {
+        if (enrollmentId == null || enrollmentId <= 0) {
+            throw new InvalidIdException();
+        }
+
+        EnrollmentEntity enrollment = enrollmentRepository.findById(enrollmentId)
+                .orElseThrow(() -> new ResourceNotFoundException(enrollmentId));
+
+        List<ExamEntity> entities = examRepository.findByEnrollment(enrollment);
+        return examMapper.toDtoList(entities);
+    }
+
+
 }

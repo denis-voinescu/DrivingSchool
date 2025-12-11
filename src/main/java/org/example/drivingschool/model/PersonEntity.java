@@ -19,7 +19,7 @@ public class PersonEntity {
     private Integer id;
 
     @NotNull
-    @Column(name = "pnc", nullable = false, length = Integer.MAX_VALUE)
+    @Column(name = "pnc", nullable = false, unique = true, length = Integer.MAX_VALUE)
     private String pnc;
 
     @NotNull
@@ -35,11 +35,11 @@ public class PersonEntity {
     private String lastName;
 
     @NotNull
-    @Column(name = "email_address", nullable = false, length = Integer.MAX_VALUE)
+    @Column(name = "email_address", nullable = false, unique = true, length = Integer.MAX_VALUE)
     private String emailAddress;
 
     @NotNull
-    @Column(name = "phone_number", nullable = false, length = Integer.MAX_VALUE)
+    @Column(name = "phone_number", nullable = false, unique = true, length = Integer.MAX_VALUE)
     private String phoneNumber;
 
     @NotNull
