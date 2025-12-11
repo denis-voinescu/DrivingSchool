@@ -15,30 +15,41 @@ import java.util.List;
 @RequestMapping("api/v1/exams")
 public class ExamController implements ExamsApi {
 
-    private final ExamService examService;
+  private final ExamService examService;
 
-    public ExamController(ExamService examService) {
-        this.examService = examService;
-    }
+  public ExamController(ExamService examService) {
+    this.examService = examService;
+  }
 
-    @Override
-    @GetMapping
-    public ResponseEntity<List<Exam>> listExamsByDate(
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-            @RequestParam(value = "date", required = false) LocalDate date) {
-        return ResponseEntity.ok(examService.list(date));
-    }
+  // Get a list of all exams, optionally filtered by date
 
-    @Override
-    @GetMapping("/{id}")
-    public ResponseEntity<Exam> getExamById(@PathVariable Integer id) {
-        return ResponseEntity.ok(examService.getById(id));
-    }
+  @Override
+  @GetMapping
+  public ResponseEntity<List<Exam>> listExamsByDate(
+      @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @RequestParam(value = "date", required = false)
+          LocalDate date) {
+    return ResponseEntity.ok(examService.list(date));
+  }
 
+  // Get a specific exam by passing its ID in the request path
 
-    @Override
-    @PatchMapping("/{id}")
-    public ResponseEntity<Exam> updateExam(@PathVariable Integer id, @RequestBody ExamUpdate examUpdate) {
-        return ResponseEntity.ok(examService.update(id, examUpdate));
-    }
+  @Override
+  @GetMapping("/{id}")
+  public ResponseEntity<Exam> getExamById(@PathVariable Integer id) {
+    return ResponseEntity.ok(examService.getById(id));
+  }
+
+  // Update an existing exam by passing its ID in the request path
+  // and an "ExamUpdate" object in the request body
+  // public ExamUpdate(@Nullable LocalDate date,
+  //                  @Nullable String hour,
+  //                  @Nullable String location,
+  //                  @Nullable Boolean completed)
+
+  @Override
+  @PatchMapping("/{id}")
+  public ResponseEntity<Exam> updateExam(
+      @PathVariable Integer id, @RequestBody ExamUpdate examUpdate) {
+    return ResponseEntity.ok(examService.update(id, examUpdate));
+  }
 }

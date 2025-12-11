@@ -14,53 +14,71 @@ import java.util.List;
 @RequestMapping("api/v1/students")
 public class StudentController implements StudentsApi {
 
-    private final StudentService studentService;
-    private final EnrollmentService enrollmentService;
-    private final LessonService lessonService;
+  private final StudentService studentService;
+  private final EnrollmentService enrollmentService;
+  private final LessonService lessonService;
 
-    public StudentController(LessonService lessonService, StudentService studentService, EnrollmentService enrollmentService) {
-        this.studentService = studentService;
-        this.enrollmentService = enrollmentService;
-        this.lessonService = lessonService;
-    }
+  public StudentController(
+      LessonService lessonService,
+      StudentService studentService,
+      EnrollmentService enrollmentService) {
+    this.studentService = studentService;
+    this.enrollmentService = enrollmentService;
+    this.lessonService = lessonService;
+  }
 
-    @Override
-    @GetMapping
-    public ResponseEntity<List<Student>> listStudents() {
-        return ResponseEntity.ok(studentService.list());
-    }
+  // Get a list of all students
 
-    @Override
-    @GetMapping("/{id}")
-    public ResponseEntity<Student> getStudentById(@PathVariable Integer id) {
-        return ResponseEntity.ok(studentService.getById(id));
-    }
+  @Override
+  @GetMapping
+  public ResponseEntity<List<Student>> listStudents() {
+    return ResponseEntity.ok(studentService.list());
+  }
 
-    @Override
-    @GetMapping("/{id}/enrollments")
-    public ResponseEntity<List<Enrollment>> listStudentEnrollments(@PathVariable Integer id) {
-        return ResponseEntity.ok(enrollmentService.listForStudent(id));
-    }
+  // Get a specific student by passing their ID as a path variable
 
-    @Override
-    @GetMapping("/{id}/lessons")
-    public ResponseEntity<List<Lesson>> listStudentLessons(
-            @PathVariable Integer id,
-            @RequestParam(value = "completed", required = false) Boolean completed) {
+  @Override
+  @GetMapping("/{id}")
+  public ResponseEntity<Student> getStudentById(@PathVariable Integer id) {
+    return ResponseEntity.ok(studentService.getById(id));
+  }
 
-        return ResponseEntity.ok(lessonService.listForStudent(id, completed));
-    }
+  // Get all enrollments for a specific student by passing their ID as a path variable
 
+  @Override
+  @GetMapping("/{id}/enrollments")
+  public ResponseEntity<List<Enrollment>> listStudentEnrollments(@PathVariable Integer id) {
+    return ResponseEntity.ok(enrollmentService.listForStudent(id));
+  }
 
-    @Override
-    @PostMapping
-    public ResponseEntity<Student> createStudent(StudentCreate studentCreate) {
-        return ResponseEntity.ok(studentService.create(studentCreate));
-    }
+  // Get all lessons for a specific student by passing their ID as a path variable
 
-    @Override
-    @PatchMapping("/{id}")
-    public ResponseEntity<Student> updateStudent(@PathVariable Integer id, StudentUpdate studentUpdate) {
-        return ResponseEntity.ok(studentService.update(id, studentUpdate));
-    }
+  @Override
+  @GetMapping("/{id}/lessons")
+  public ResponseEntity<List<Lesson>> listStudentLessons(
+      @PathVariable Integer id,
+      @RequestParam(value = "completed", required = false) Boolean completed) {
+
+    return ResponseEntity.ok(lessonService.listForStudent(id, completed));
+  }
+
+  // Create a student by passing a "StudentCreate" DTO in the request body
+  // public StudentCreate(Integer personId)
+
+  @Override
+  @PostMapping
+  public ResponseEntity<Student> createStudent(StudentCreate studentCreate) {
+    return ResponseEntity.ok(studentService.create(studentCreate));
+  }
+
+  // Update a student by passing their ID as a path variable
+  // and a "StudentUpdate" DTO in the request body
+  // public StudentUpdate(@Nullable Boolean isCompliant)
+
+  @Override
+  @PatchMapping("/{id}")
+  public ResponseEntity<Student> updateStudent(
+      @PathVariable Integer id, StudentUpdate studentUpdate) {
+    return ResponseEntity.ok(studentService.update(id, studentUpdate));
+  }
 }

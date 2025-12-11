@@ -12,26 +12,25 @@ import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 
 @Mapper(
-        componentModel = "spring",
-        nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE
-)
+    componentModel = "spring",
+    nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface EnrollmentMapper {
 
-    @Mapping(target = "student", ignore = true)
-    @Mapping(target = "instructor", ignore = true)
-    @Mapping(target = "vehicle", ignore = true)
-    EnrollmentEntity toEntity(EnrollmentCreate dto);
+  @Mapping(target = "student", ignore = true)
+  @Mapping(target = "instructor", ignore = true)
+  @Mapping(target = "vehicle", ignore = true)
+  EnrollmentEntity toEntity(EnrollmentCreate dto);
 
-    @Mapping(source = "student.id", target = "studentId")
-    @Mapping(source = "instructor.id", target = "instructorId")
-    @Mapping(source = "vehicle.id", target = "vehicleId")
-    Enrollment toDto(EnrollmentEntity entity);
+  @Mapping(source = "student.id", target = "studentId")
+  @Mapping(source = "instructor.id", target = "instructorId")
+  @Mapping(source = "vehicle.id", target = "vehicleId")
+  Enrollment toDto(EnrollmentEntity entity);
 
-    default OffsetDateTime map(Instant value) {
-        return value == null ? null : value.atOffset(ZoneOffset.UTC);
-    }
+  default OffsetDateTime map(Instant value) {
+    return value == null ? null : value.atOffset(ZoneOffset.UTC);
+  }
 
-    default Instant map(OffsetDateTime value) {
-        return value == null ? null : value.toInstant();
-    }
+  default Instant map(OffsetDateTime value) {
+    return value == null ? null : value.toInstant();
+  }
 }

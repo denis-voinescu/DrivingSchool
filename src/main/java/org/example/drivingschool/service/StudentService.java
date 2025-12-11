@@ -19,63 +19,63 @@ import java.util.List;
 @Service
 public class StudentService {
 
-    private final StudentRepository studentRepository;
-    private final PersonRepository personRepository;
-    private final StudentMapper studentMapper;
+  private final StudentRepository studentRepository;
+  private final PersonRepository personRepository;
+  private final StudentMapper studentMapper;
 
-    public StudentService(StudentRepository studentRepository,
-                          PersonRepository personRepository,
-                          StudentMapper studentMapper) {
-        this.studentRepository = studentRepository;
-        this.personRepository = personRepository;
-        this.studentMapper = studentMapper;
+  public StudentService(
+      StudentRepository studentRepository,
+      PersonRepository personRepository,
+      StudentMapper studentMapper) {
+    this.studentRepository = studentRepository;
+    this.personRepository = personRepository;
+    this.studentMapper = studentMapper;
+  }
+
+  @Transactional(readOnly = true)
+  public List<Student> list() {
+    return studentRepository.findAll().stream().map(studentMapper::toDto).toList();
+  }
+
+  @Transactional(readOnly = true)
+  public Student getById(Integer id) {
+    if (id == null || id <= 0) {
+      throw new InvalidIdException();
     }
 
-    @Transactional(readOnly = true)
-    public List<Student> list() {
-        return studentRepository.findAll()
-                .stream()
-                .map(studentMapper::toDto)
-                .toList();
+    StudentEntity entity =
+        studentRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(id));
+
+    return studentMapper.toDto(entity);
+  }
+
+  public Student create(StudentCreate studentCreate) {
+
+    PersonEntity person =
+        personRepository
+            .findById(studentCreate.getPersonId())
+            .orElseThrow(() -> new ResourceNotFoundException(studentCreate.getPersonId()));
+
+    StudentEntity entity = studentMapper.toEntity(studentCreate);
+    entity.setPerson(person);
+    entity.setCreatedAt(Instant.now());
+
+    StudentEntity saved = studentRepository.save(entity);
+    return studentMapper.toDto(saved);
+  }
+
+  public Student update(Integer id, StudentUpdate patch) {
+    if (id == null || id <= 0) {
+      throw new InvalidIdException();
     }
 
-    @Transactional(readOnly = true)
-    public Student getById(Integer id) {
-        if (id == null || id <= 0) {
-            throw new InvalidIdException();
-        }
+    StudentEntity entity =
+        studentRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(id));
 
-        StudentEntity entity = studentRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(id));
+    studentMapper.updateEntity(entity, patch);
+    entity.setUpdatedAt(Instant.now());
 
-        return studentMapper.toDto(entity);
-    }
-
-    public Student create(StudentCreate studentCreate) {
-
-        PersonEntity person = personRepository.findById(studentCreate.getPersonId())
-                .orElseThrow(() -> new ResourceNotFoundException(studentCreate.getPersonId()));
-
-        StudentEntity entity = studentMapper.toEntity(studentCreate);
-        entity.setPerson(person);
-        entity.setCreatedAt(Instant.now());
-
-        StudentEntity saved = studentRepository.save(entity);
-        return studentMapper.toDto(saved);
-    }
-
-    public Student update(Integer id, StudentUpdate patch) {
-        if (id == null || id <= 0) {
-            throw new InvalidIdException();
-        }
-
-        StudentEntity entity = studentRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(id));
-
-        studentMapper.updateEntity(entity, patch);
-        entity.setUpdatedAt(Instant.now());
-
-        StudentEntity saved = studentRepository.save(entity);
-        return studentMapper.toDto(saved);
-    }
+    StudentEntity saved = studentRepository.save(entity);
+    return studentMapper.toDto(saved);
+  }
 }

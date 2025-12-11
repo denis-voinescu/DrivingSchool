@@ -9,7 +9,5 @@ import java.util.List;
 
 @Repository
 public interface EnrollmentRepository extends JpaRepository<EnrollmentEntity, Integer> {
-    List<EnrollmentEntity> findByStudent(StudentEntity student);
-
-
+  List<EnrollmentEntity> findByStudent(StudentEntity student);
 }

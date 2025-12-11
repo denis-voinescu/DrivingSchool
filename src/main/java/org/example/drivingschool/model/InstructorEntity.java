@@ -13,33 +13,34 @@ import java.time.Instant;
 @Entity
 @Table(name = "instructor")
 public class InstructorEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false)
-    private Integer id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Column(name = "id", nullable = false)
+  private Integer id;
 
-    @NotNull
-    @OneToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "person_id", nullable = false)
-    private PersonEntity person;
+  @NotNull
+  @OneToOne(fetch = FetchType.LAZY, optional = false)
+  @JoinColumn(name = "person_id", nullable = false)
+  private PersonEntity person;
 
-    @NotNull
-    @ColumnDefault("false")
-    @Column(name = "is_compliant", nullable = false)
-    private Boolean isCompliant = false;
+  @NotNull
+  @ColumnDefault("false")
+  @Column(name = "is_compliant", nullable = false)
+  private Boolean isCompliant = false;
 
-    @NotNull
-    @ColumnDefault("true")
-    @Column(name = "is_active", nullable = false)
-    private Boolean isActive = false;
+  @NotNull
+  @ColumnDefault("true")
+  @Column(name = "is_active", nullable = false)
+  private Boolean isActive = false;
 
-    @NotNull
-    @Column(name = "created_at", nullable = false)
-    private Instant createdAt;
-    @Column(name = "updated_at")
-    private Instant updatedAt;
+  @NotNull
+  @Column(name = "created_at", nullable = false)
+  private Instant createdAt;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "license_category", nullable = false)
-    private LicenseCategory licenseCategory;
+  @Column(name = "updated_at")
+  private Instant updatedAt;
+
+  @Enumerated(EnumType.STRING)
+  @Column(name = "license_category", nullable = false)
+  private LicenseCategory licenseCategory;
 }

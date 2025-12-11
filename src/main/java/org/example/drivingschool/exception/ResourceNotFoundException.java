@@ -4,11 +4,10 @@ import lombok.Getter;
 
 @Getter
 public class ResourceNotFoundException extends RuntimeException {
-    private final Integer id;
+  private final Integer id;
 
-    public ResourceNotFoundException(Integer id) {
-        super("Could not find resource with ID: " + id);
-        this.id = id;
-    }
-
+  public ResourceNotFoundException(Integer id) {
+    super("Could not find resource with ID: " + id);
+    this.id = id;
+  }
 }

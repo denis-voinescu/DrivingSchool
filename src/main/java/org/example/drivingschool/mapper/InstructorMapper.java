@@ -14,24 +14,23 @@ import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 
 @Mapper(
-        componentModel = "spring",
-        nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE
-)
+    componentModel = "spring",
+    nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface InstructorMapper {
 
-    @Mapping(target = "person", ignore = true)
-    InstructorEntity toEntity(InstructorCreate dto);
+  @Mapping(target = "person", ignore = true)
+  InstructorEntity toEntity(InstructorCreate dto);
 
-    @Mapping(source = "person.id", target = "personId")
-    Instructor toDto(InstructorEntity entity);
+  @Mapping(source = "person.id", target = "personId")
+  Instructor toDto(InstructorEntity entity);
 
-    void updateEntity(@MappingTarget InstructorEntity entity, InstructorUpdate dto);
+  void updateEntity(@MappingTarget InstructorEntity entity, InstructorUpdate dto);
 
-    default OffsetDateTime map(Instant value) {
-        return value == null ? null : value.atOffset(ZoneOffset.UTC);
-    }
+  default OffsetDateTime map(Instant value) {
+    return value == null ? null : value.atOffset(ZoneOffset.UTC);
+  }
 
-    default Instant map(OffsetDateTime value) {
-        return value == null ? null : value.toInstant();
-    }
+  default Instant map(OffsetDateTime value) {
+    return value == null ? null : value.toInstant();
+  }
 }

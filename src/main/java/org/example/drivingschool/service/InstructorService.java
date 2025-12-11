@@ -16,63 +16,66 @@ import java.util.List;
 @Service
 public class InstructorService {
 
-    private final InstructorRepository instructorRepository;
-    private final PersonRepository personRepository;
-    private final InstructorMapper instructorMapper;
+  private final InstructorRepository instructorRepository;
+  private final PersonRepository personRepository;
+  private final InstructorMapper instructorMapper;
 
-    public InstructorService(InstructorRepository instructorRepository, PersonRepository personRepository, InstructorMapper instructorMapper) {
-        this.instructorRepository = instructorRepository;
-        this.instructorMapper = instructorMapper;
-        this.personRepository = personRepository;
+  public InstructorService(
+      InstructorRepository instructorRepository,
+      PersonRepository personRepository,
+      InstructorMapper instructorMapper) {
+    this.instructorRepository = instructorRepository;
+    this.instructorMapper = instructorMapper;
+    this.personRepository = personRepository;
+  }
+
+  @Transactional(readOnly = true)
+  public List<Instructor> list() {
+
+    return instructorRepository.findAll().stream().map(instructorMapper::toDto).toList();
+  }
+
+  @Transactional(readOnly = true)
+  public Instructor getById(Integer id) {
+
+    if (id == null || id <= 0) {
+      throw new InvalidIdException();
     }
 
-    @Transactional(readOnly = true)
-    public List<Instructor> list() {
+    InstructorEntity entity =
+        instructorRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(id));
 
-        return instructorRepository.findAll().stream().map(instructorMapper::toDto).toList();
+    return instructorMapper.toDto(entity);
+  }
 
+  public Instructor create(InstructorCreate instructorCreate) {
+
+    InstructorEntity instructorEntity = instructorMapper.toEntity(instructorCreate);
+
+    instructorEntity.setPerson(
+        personRepository
+            .findById(instructorCreate.getPersonId())
+            .orElseThrow(() -> new ResourceNotFoundException(instructorCreate.getPersonId())));
+
+    instructorEntity.setCreatedAt(Instant.now());
+    InstructorEntity saved = instructorRepository.save(instructorEntity);
+
+    return instructorMapper.toDto(saved);
+  }
+
+  public Instructor update(Integer id, InstructorUpdate patch) {
+
+    if (id == null || id <= 0) {
+      throw new InvalidIdException();
     }
 
-    @Transactional(readOnly = true)
-    public Instructor getById(Integer id) {
+    InstructorEntity entity =
+        instructorRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(id));
 
-        if (id == null || id <= 0) {
-            throw new InvalidIdException();
-        }
+    instructorMapper.updateEntity(entity, patch);
+    entity.setUpdatedAt(Instant.now());
 
-        InstructorEntity entity = instructorRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(id));
-
-        return instructorMapper.toDto(entity);
-    }
-
-    public Instructor create(InstructorCreate instructorCreate) {
-
-        InstructorEntity instructorEntity = instructorMapper.toEntity(instructorCreate);
-
-        instructorEntity.setPerson(
-                personRepository.findById(instructorCreate.getPersonId())
-                        .orElseThrow(() -> new ResourceNotFoundException(instructorCreate.getPersonId()))
-        );
-
-        instructorEntity.setCreatedAt(Instant.now());
-        InstructorEntity saved = instructorRepository.save(instructorEntity);
-
-        return instructorMapper.toDto(saved);
-    }
-
-    public Instructor update(Integer id, InstructorUpdate patch) {
-
-        if (id == null || id <= 0) {
-            throw new InvalidIdException();
-        }
-
-        InstructorEntity entity = instructorRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(id));
-
-        instructorMapper.updateEntity(entity, patch);
-        entity.setUpdatedAt(Instant.now());
-
-        InstructorEntity saved = instructorRepository.save(entity);
-        return instructorMapper.toDto(saved);
-    }
-
+    InstructorEntity saved = instructorRepository.save(entity);
+    return instructorMapper.toDto(saved);
+  }
 }

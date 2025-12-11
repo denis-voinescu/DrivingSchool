@@ -17,56 +17,55 @@ import java.util.List;
 @Service
 public class PersonService {
 
-    private final PersonRepository personRepository;
-    private final PersonMapper personMapper;
+  private final PersonRepository personRepository;
+  private final PersonMapper personMapper;
 
-    public PersonService(PersonRepository personRepository, PersonMapper personMapper) {
-        this.personRepository = personRepository;
-        this.personMapper = personMapper;
+  public PersonService(PersonRepository personRepository, PersonMapper personMapper) {
+    this.personRepository = personRepository;
+    this.personMapper = personMapper;
+  }
+
+  @Transactional(readOnly = true)
+  public List<Person> list() {
+
+    return personRepository.findAll().stream().map(personMapper::toDto).toList();
+  }
+
+  @Transactional(readOnly = true)
+  public Person getById(Integer id) {
+
+    if (id == null || id <= 0) {
+      throw new InvalidIdException();
     }
 
-    @Transactional(readOnly = true)
-    public List<Person> list() {
+    PersonEntity entity =
+        personRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(id));
 
-        return personRepository.findAll().stream().map(personMapper::toDto).toList();
+    return personMapper.toDto(entity);
+  }
 
+  public Person create(PersonCreate personCreate) {
+
+    PersonEntity personEntity = personMapper.toEntity(personCreate);
+    personEntity.setCreatedAt(Instant.now());
+    PersonEntity savedPersonEntity = personRepository.save(personEntity);
+
+    return personMapper.toDto(savedPersonEntity);
+  }
+
+  public Person update(Integer id, PersonUpdate patch) {
+
+    if (id == null || id <= 0) {
+      throw new InvalidIdException();
     }
 
-    @Transactional(readOnly = true)
-    public Person getById(Integer id) {
+    PersonEntity entity =
+        personRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(id));
 
-        if (id == null || id <= 0) {
-            throw new InvalidIdException();
-        }
+    personMapper.updateEntity(entity, patch);
+    entity.setUpdatedAt(Instant.now());
 
-        PersonEntity entity = personRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(id));
-
-        return personMapper.toDto(entity);
-    }
-
-    public Person create(PersonCreate personCreate) {
-
-        PersonEntity personEntity = personMapper.toEntity(personCreate);
-        personEntity.setCreatedAt(Instant.now());
-        PersonEntity savedPersonEntity = personRepository.save(personEntity);
-
-        return personMapper.toDto(savedPersonEntity);
-    }
-
-    public Person update(Integer id, PersonUpdate patch) {
-
-        if (id == null || id <= 0) {
-            throw new InvalidIdException();
-        }
-
-        PersonEntity entity = personRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(id));
-
-        personMapper.updateEntity(entity, patch);
-        entity.setUpdatedAt(Instant.now());
-
-        PersonEntity saved = personRepository.save(entity);
-        return personMapper.toDto(saved);
-    }
-
-
+    PersonEntity saved = personRepository.save(entity);
+    return personMapper.toDto(saved);
+  }
 }

@@ -15,43 +15,63 @@ import java.util.List;
 @RequestMapping("api/v1/instructors")
 public class InstructorController implements InstructorsApi {
 
-    private final InstructorService instructorService;
-    private final LessonService lessonService;
+  private final InstructorService instructorService;
+  private final LessonService lessonService;
 
-    public InstructorController(InstructorService instructorService, LessonService lessonService) {
-        this.instructorService = instructorService;
-        this.lessonService = lessonService;
-    }
+  public InstructorController(InstructorService instructorService, LessonService lessonService) {
+    this.instructorService = instructorService;
+    this.lessonService = lessonService;
+  }
 
-    @Override
-    @PostMapping
-    public ResponseEntity<Instructor> createInstructor(@Valid @RequestBody InstructorCreate instructorCreate) {
-        return ResponseEntity.ok(instructorService.create(instructorCreate));
-    }
+  // Create an instructor by passing an "InstructorCreate" DTO in the request body
+  // public InstructorCreate(Integer personId,
+  //                        LicenseCategory licenseCategory,
+  //                        @Nullable Boolean isCompliant,
+  //                        @Nullable Boolean isActive)
 
-    @Override
-    @GetMapping("/{id}")
-    public ResponseEntity<Instructor> getInstructorById(@PathVariable Integer id) {
-        return ResponseEntity.ok(instructorService.getById(id));
+  @Override
+  @PostMapping
+  public ResponseEntity<Instructor> createInstructor(
+      @Valid @RequestBody InstructorCreate instructorCreate) {
+    return ResponseEntity.ok(instructorService.create(instructorCreate));
+  }
 
-    }
+  // Get a specific instructor by passing their ID as a path variable
 
-    @Override
-    @GetMapping({"/{id}/lessons"})
-    public ResponseEntity<List<Lesson>> listInstructorLessons(Integer id, LocalDate date) {
-        return ResponseEntity.ok(lessonService.listForInstructor(id, date));
-    }
+  @Override
+  @GetMapping("/{id}")
+  public ResponseEntity<Instructor> getInstructorById(@PathVariable Integer id) {
+    return ResponseEntity.ok(instructorService.getById(id));
+  }
 
+  // Get all lessons for a specific instructor by passing their ID as a path variable
+  // and an optional date filter as a query parameter
 
-    @Override
-    @GetMapping
-    public ResponseEntity<List<Instructor>> listInstructors() {
-        return ResponseEntity.ok(instructorService.list());
-    }
+  @Override
+  @GetMapping({"/{id}/lessons"})
+  public ResponseEntity<List<Lesson>> listInstructorLessons(
+      @PathVariable Integer id, LocalDate date) {
+    return ResponseEntity.ok(lessonService.listForInstructor(id, date));
+  }
 
-    @Override
-    @PatchMapping("/{id}")
-    public ResponseEntity<Instructor> updateInstructor(@PathVariable Integer id, InstructorUpdate instructorUpdate) {
-        return ResponseEntity.ok(instructorService.update(id, instructorUpdate));
-    }
+  // Get a list of all instructors
+
+  @Override
+  @GetMapping
+  public ResponseEntity<List<Instructor>> listInstructors() {
+    return ResponseEntity.ok(instructorService.list());
+  }
+
+  // Update an instructor by passing their ID as a path variable
+  // and an "InstructorUpdate" DTO in the request body
+  // public InstructorUpdate(@Nullable LicenseCategory licenseCategory,
+  //                        @Nullable Boolean isCompliant,
+  //                        @Nullable Boolean isActive)
+
+  @Override
+  @PatchMapping("/{id}")
+  public ResponseEntity<Instructor> updateInstructor(
+      @PathVariable Integer id, InstructorUpdate instructorUpdate) {
+    return ResponseEntity.ok(instructorService.update(id, instructorUpdate));
+  }
 }

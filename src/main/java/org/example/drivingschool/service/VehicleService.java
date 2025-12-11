@@ -17,53 +17,50 @@ import java.util.List;
 @Service
 public class VehicleService {
 
-    private final VehicleRepository vehicleRepository;
-    private final VehicleMapper vehicleMapper;
+  private final VehicleRepository vehicleRepository;
+  private final VehicleMapper vehicleMapper;
 
-    public VehicleService(VehicleRepository vehicleRepository, VehicleMapper vehicleMapper) {
-        this.vehicleRepository = vehicleRepository;
-        this.vehicleMapper = vehicleMapper;
+  public VehicleService(VehicleRepository vehicleRepository, VehicleMapper vehicleMapper) {
+    this.vehicleRepository = vehicleRepository;
+    this.vehicleMapper = vehicleMapper;
+  }
+
+  @Transactional(readOnly = true)
+  public List<Vehicle> list() {
+    return vehicleRepository.findAll().stream().map(vehicleMapper::toDto).toList();
+  }
+
+  @Transactional(readOnly = true)
+  public Vehicle getById(Integer id) {
+    if (id == null || id <= 0) {
+      throw new InvalidIdException();
     }
 
-    @Transactional(readOnly = true)
-    public List<Vehicle> list() {
-        return vehicleRepository.findAll()
-                .stream()
-                .map(vehicleMapper::toDto)
-                .toList();
+    VehicleEntity entity =
+        vehicleRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(id));
+
+    return vehicleMapper.toDto(entity);
+  }
+
+  public Vehicle create(VehicleCreate vehicleCreate) {
+    VehicleEntity entity = vehicleMapper.toEntity(vehicleCreate);
+    entity.setCreatedAt(Instant.now());
+    VehicleEntity saved = vehicleRepository.save(entity);
+    return vehicleMapper.toDto(saved);
+  }
+
+  public Vehicle update(Integer id, VehicleUpdate patch) {
+    if (id == null || id <= 0) {
+      throw new InvalidIdException();
     }
 
-    @Transactional(readOnly = true)
-    public Vehicle getById(Integer id) {
-        if (id == null || id <= 0) {
-            throw new InvalidIdException();
-        }
+    VehicleEntity entity =
+        vehicleRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(id));
 
-        VehicleEntity entity = vehicleRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(id));
+    vehicleMapper.updateEntity(entity, patch);
+    entity.setUpdatedAt(Instant.now());
 
-        return vehicleMapper.toDto(entity);
-    }
-
-    public Vehicle create(VehicleCreate vehicleCreate) {
-        VehicleEntity entity = vehicleMapper.toEntity(vehicleCreate);
-        entity.setCreatedAt(Instant.now());
-        VehicleEntity saved = vehicleRepository.save(entity);
-        return vehicleMapper.toDto(saved);
-    }
-
-    public Vehicle update(Integer id, VehicleUpdate patch) {
-        if (id == null || id <= 0) {
-            throw new InvalidIdException();
-        }
-
-        VehicleEntity entity = vehicleRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(id));
-
-        vehicleMapper.updateEntity(entity, patch);
-        entity.setUpdatedAt(Instant.now());
-
-        VehicleEntity saved = vehicleRepository.save(entity);
-        return vehicleMapper.toDto(saved);
-    }
+    VehicleEntity saved = vehicleRepository.save(entity);
+    return vehicleMapper.toDto(saved);
+  }
 }
