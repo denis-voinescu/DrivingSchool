@@ -4,7 +4,6 @@ import org.example.drivingschool.exception.InvalidIdException;
 import org.example.drivingschool.exception.ResourceNotFoundException;
 import org.example.drivingschool.mapper.InstructorMapper;
 import org.example.drivingschool.model.InstructorEntity;
-import org.example.drivingschool.model.PersonEntity;
 import org.example.drivingschool.repository.InstructorRepository;
 import org.example.drivingschool.repository.PersonRepository;
 import org.openapitools.model.*;

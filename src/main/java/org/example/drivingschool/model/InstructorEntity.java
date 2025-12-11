@@ -42,5 +42,4 @@ public class InstructorEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "license_category", nullable = false)
     private LicenseCategory licenseCategory;
-
 }
